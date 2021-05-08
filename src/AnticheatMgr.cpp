@@ -28,6 +28,12 @@ AnticheatMgr::~AnticheatMgr()
 	m_Players.clear();
 }
 
+AnticheatMgr* AnticheatMgr::instance()
+{
+    static AnticheatMgr instance;
+    return &instance;
+}
+
 void AnticheatMgr::SetExcludedMaps()
 {
     excludeACMapsId.clear();
@@ -35,7 +41,9 @@ void AnticheatMgr::SetExcludedMaps()
     std::stringstream excludeStream(sConfigMgr->GetOption<std::string>("AntiCheats.forceExcludeMapsid", ""));
     std::string temp;
     while (std::getline(excludeStream, temp, ','))
+    {
         excludeACMapsId.insert(atoi(temp.c_str()));
+    }
 
     LOG_INFO("anticheat", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
 }
@@ -57,9 +65,13 @@ void AnticheatMgr::HandlePlayerLogout(Player* player)
 void AnticheatMgr::DeleteCommand(ObjectGuid guid /*= ObjectGuid::Empty*/)
 {
     if (!guid)
+    {
         m_Players.clear();
+    }
     else
+    {
         m_Players.erase(guid);
+    }
 }
 
 void AnticheatMgr::SetClientTimestamps(Player* player)
@@ -76,56 +88,72 @@ void AnticheatMgr::Update(Player* player, uint32 time)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.Update(time);
+    }
 }
 
 void AnticheatMgr::SetSkipOnePacketForASH(Player* player, bool apply)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.SetSkipOnePacketForASH(apply);
+    }
 }
 
 void AnticheatMgr::SetCanFlybyServer(Player* player, bool apply)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.SetCanFlybyServer(apply);
+    }
 }
 
 void AnticheatMgr::SetUnderACKmount(Player* player)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.SetUnderACKmount();
+    }
 }
 
 void AnticheatMgr::SetRootACKUpd(Player* player)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.SetRootACKUpd();
+    }
 }
 
 void AnticheatMgr::SetJumpingbyOpcode(Player* player, bool jump)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.SetJumpingbyOpcode(jump);
+    }
 }
 
 void AnticheatMgr::UpdateMovementInfo(Player* player, MovementInfo const& movementInfo)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         itr->second.UpdateMovementInfo(movementInfo);
+    }
 }
 
 bool AnticheatMgr::HandleDoubleJump(Player* player, Unit* mover)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         return itr->second.HandleDoubleJump(mover);
+    }
 
     return true;
 }
@@ -134,7 +162,9 @@ bool AnticheatMgr::CheckMovementInfo(Player* player, MovementInfo const& movemen
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
+    {
         return itr->second.CheckMovementInfo(movementInfo, mover, jump);
+    }
 
     return true;
 }

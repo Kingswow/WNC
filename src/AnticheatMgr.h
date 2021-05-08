@@ -16,9 +16,9 @@
 #ifndef SC_ACMGR_H
 #define SC_ACMGR_H
 
+#include "AnticheatData.h"
 #include "ObjectGuid.h"
 
-class AnticheatData;
 class Player;
 class Unit;
 
@@ -33,11 +33,7 @@ class AnticheatMgr
     ~AnticheatMgr();
 
     public:
-        static AnticheatMgr* instance()
-        {
-            static AnticheatMgr* instance = new AnticheatMgr();
-            return instance;
-        }
+        static AnticheatMgr* instance();
 
         void SetExcludedMaps();
 

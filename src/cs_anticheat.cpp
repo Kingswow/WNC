@@ -58,11 +58,16 @@ public:
             normalizePlayerName(strCommand);
 
             pTarget = ObjectAccessor::FindPlayerByName(strCommand.c_str()); // get player by name
-        }else
+        }
+        else
+        {
             pTarget = handler->getSelectedPlayer();
+        }
 
         if (!pTarget)
+        {
             return false;
+        }
 
         WorldPacket data;
 
@@ -94,8 +99,11 @@ public:
             normalizePlayerName(strCommand);
 
             pTarget = ObjectAccessor::FindPlayerByName(strCommand.c_str()); // get player by name
-        }else
+        }
+        else
+        {
             pTarget = handler->getSelectedPlayer();
+        }
 
         if (!pTarget)
         {
@@ -105,13 +113,13 @@ public:
         }
 
         if (pTarget == handler->GetSession()->GetPlayer())
+        {
             return false;
+        }
 
         // teleport both to jail.
         pTarget->TeleportTo(1,16226.5f,16403.6f,-64.5f,3.2f);
         handler->GetSession()->GetPlayer()->TeleportTo(1,16226.5f,16403.6f,-64.5f,3.2f);
-
-
 
         // the player should be already there, but no :(
         // pTarget->GetPosition(&loc);
@@ -119,10 +127,6 @@ public:
         WorldLocation loc;
         loc = WorldLocation(1, 16226.5f, 16403.6f, -64.5f, 3.2f);
         pTarget->SetHomebind(loc, 876);
-
-
-
-        pTarget->SetHomebind(loc,876);
         return true;
     }
 
@@ -133,20 +137,28 @@ public:
         char* command = strtok((char*)args, " "); // get entered name
 
         if (!command)
+        {
             return true;
+        }
 
         strCommand = command;
 
         if (strCommand.compare("deleteall") == 0)
+        {
             sAnticheatMgr->DeleteCommand();
+        }
         else
         {
             normalizePlayerName(strCommand);
             Player* player = ObjectAccessor::FindPlayerByName(strCommand.c_str()); // get player by name
             if (!player)
+            {
                 handler->PSendSysMessage("Player doesn't exist");
+            }
             else
+            {
                 sAnticheatMgr->DeleteCommand(player->GetGUID());
+            }
         }
 
         return true;

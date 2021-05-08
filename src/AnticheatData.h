@@ -1,7 +1,7 @@
 #ifndef SC_ACDATA_H
 #define SC_ACDATA_H
 
-#include "AnticheatMgr.h"
+#include "Common.h"
 
 class Player;
 class Unit;

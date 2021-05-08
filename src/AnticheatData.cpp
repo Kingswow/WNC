@@ -1,4 +1,5 @@
 #include "AnticheatData.h"
+#include "AnticheatMgr.h"
 #include "AnticheatLanguage.h"
 #include "Config.h"
 #include "Player.h"
@@ -10,7 +11,9 @@ AnticheatData::AnticheatData(Player* player /* =nullptr*/) : m_owner(player)
 {
     m_flyhackTimer = 0;
     if (sConfigMgr->GetOption<bool>("AntiCheats.FlyHack.Enabled", true))
+    {
         m_flyhackTimer = sConfigMgr->GetOption<int32>("AntiCheats.FlyHackTimer", 1000);
+    }
 
     m_mountTimer = 0;
     m_rootUpdTimer = 0;
@@ -34,12 +37,16 @@ void AnticheatData::Update(uint32 time)
         if (time >= m_flyhackTimer)
         {
             if (!CheckOnFlyHack() && sConfigMgr->GetOption<bool>("AntiCheats.FlyHack.Kick.Enabled", true))
+            {
                 m_owner->GetSession()->KickPlayer();
+            }
 
             m_flyhackTimer = sConfigMgr->GetOption<int32>("AntiCheats.FlyHackTimer", 1000);
         }
         else
+        {
             m_flyhackTimer -= time;
+        }
     }
 
     if (m_ACKmounted && m_mountTimer > 0)
@@ -50,7 +57,9 @@ void AnticheatData::Update(uint32 time)
             m_ACKmounted = false;
         }
         else
+        {
             m_mountTimer -= time;
+        }
     }
 
     if (m_rootUpd && m_rootUpdTimer > 0)
@@ -61,7 +70,9 @@ void AnticheatData::Update(uint32 time)
             m_rootUpd = false;
         }
         else
+        {
             m_rootUpdTimer -= time;
+        }
     }
 }
 
@@ -81,16 +92,24 @@ void AnticheatData::SetRootACKUpd()
 bool AnticheatData::CheckOnFlyHack()
 {
     if (IsCanFlybyServer())
+    {
         return true;
+    }
 
     if (m_owner->IsFalling() || m_owner->IsFalling())
+    {
         return true;
+    }
 
     if (m_owner->m_mover != m_owner)
+    {
         return true;
+    }
 
     if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()))
+    {
         return true;
+    }
 
     if (m_owner->IsFlying() && !m_owner->CanFly()) // kick flyhacks
     {
@@ -104,25 +123,39 @@ bool AnticheatData::CheckOnFlyHack()
     }
 
     if (m_owner->IsFlying() || m_owner->IsLevitating() || m_owner->IsInFlight())
+    {
         return true;
+    }
 
     if (m_owner->GetVehicle() || m_owner->GetVehicleKit())
+    {
         return true;
+    }
 
     if (m_owner->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+    {
         return true;
+    }
 
     if (m_owner->GetTransport() || m_owner->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
         return true;
+    }
 
     if (m_owner->HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+    {
         return true;
+    }
 
     if (UnderACKmount())
+    {
         return true;
+    }
 
     if (IsSkipOnePacketForASH())
+    {
         return true;
+    }
 
     Position npos;
     m_owner->GetPosition(&npos);
@@ -132,7 +165,9 @@ bool AnticheatData::CheckOnFlyHack()
         float waterlevel = m_owner->GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
         bool hovergaura = m_owner->HasAuraType(SPELL_AURA_WATER_WALK) || m_owner->HasAuraType(SPELL_AURA_HOVER);
         if (waterlevel && (pz - waterlevel) <= (hovergaura ? m_owner->GetCollisionHeight() + 2.5f : m_owner->GetCollisionHeight() + 1.5f))
+        {
             return true;
+        }
 
         LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s (%s)",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str());
@@ -150,7 +185,9 @@ bool AnticheatData::CheckOnFlyHack()
         {
             float waterlevel = m_owner->GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
             if (waterlevel && waterlevel + m_owner->GetCollisionHeight() > pz)
+            {
                 return true;
+            }
 
             float cx, cy, cz;
             m_owner->GetVoidClosePoint(cx, cy, cz, DEFAULT_PLAYER_BOUNDING_RADIUS, 2.0f, 0, 6.8f); // first check
@@ -244,21 +281,27 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
     if (ctime)
     {
         if (m_owner->IsFalling() || m_owner->IsInFlight())
+        {
             return true;
+        }
 
         bool vehicle = false;
         if (m_owner->GetVehicleKit() && m_owner->GetVehicleKit()->GetBase())
             vehicle = true;
 
         if (m_owner->GetVehicle())
+        {
             return true;
+        }
 
         bool transportflag = m_owner->GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || m_owner->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
         if (sConfigMgr->GetOption<bool>("AntiCheats.SafeMode.Enabled", true))
         {
             if (UnderACKmount() || transportflag)
+            {
                 return true;
+            }
         }
 
         if (IsSkipOnePacketForASH())
@@ -284,13 +327,17 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                         return false;
                     }
                     else
+                    {
                         return true;
+                    }
                 }
             }
         }
 
         if (m_owner->HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+        {
             return true;
+        }
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
         distance = npos.GetExactDist2d(m_owner);
@@ -300,8 +347,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
             float diffz = fabs(movementInfo.pos.GetPositionZ() - m_owner->GetPositionZ());
             float tanangle = distance / diffz;
 
-            if (movementInfo.pos.GetPositionZ() > m_owner->GetPositionZ() &&
-                diffz > 1.87f &&
+            if (movementInfo.pos.GetPositionZ() > m_owner->GetPositionZ() && diffz > 1.87f &&
                 tanangle < 0.57735026919f) // 30 degrees
             {
                 std::string mapname = m_owner->GetMap()->GetMapName();
@@ -316,7 +362,9 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                     return false;
                 }
                 else
+                {
                     return true;
+                }
             }
         }
 
@@ -328,24 +376,36 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         ping = std::max(uint32(60), latency);
 
         if (!vehicle)
+        {
             speed = m_owner->GetSpeed(MOVE_RUN);
+        }
         else
+        {
             speed = m_owner->GetVehicleKit()->GetBase()->GetSpeed(MOVE_RUN);
+        }
 
         if (m_owner->isSwimming())
         {
             if (!vehicle)
+            {
                 speed = m_owner->GetSpeed(MOVE_SWIM);
+            }
             else
+            {
                 speed = m_owner->GetVehicleKit()->GetBase()->GetSpeed(MOVE_SWIM);
+            }
         }
 
         if (m_owner->IsFlying() || m_owner->CanFly())
         {
             if (!vehicle)
+            {
                 speed = m_owner->GetSpeed(MOVE_FLIGHT);
+            }
             else
+            {
                 speed = m_owner->GetVehicleKit()->GetBase()->GetSpeed(MOVE_FLIGHT);
+            }
         }
 
         delaysentrecieve = (ctime - oldstime) / 10000000000;
@@ -353,10 +413,14 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         difftime = (movetime - ctime + ping) * 0.001f + delay;
         normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
         if (UnderACKmount() || transportflag)
+        {
             normaldistance *= 3.0f;
+        }
 
         if (distance < normaldistance)
+        {
             return true;
+        }
 
         m_owner->GetPosition(x, y);
 
@@ -379,14 +443,16 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, m_owner->GetName().c_str(), normaldistance, distance);
     }
     else
+        {
         return true;
+    }
 
     if (sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Kick.Enabled", true))
     {
         return false;
     }
-    else
-        return true;
+
+    return true;
 }
 
 bool AnticheatData::HandleDoubleJump(Unit* mover)
