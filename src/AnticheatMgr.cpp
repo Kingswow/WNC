@@ -48,6 +48,20 @@ void AnticheatMgr::SetExcludedMaps()
     LOG_INFO("anticheat", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
 }
 
+void AnticheatMgr::SetExcludedAreas()
+{
+    excludeACAreasId.clear();
+
+    std::stringstream excludeStream(sConfigMgr->GetOption<std::string>("AntiCheats.forceExcludeAreasid", ""));
+    std::string temp;
+    while (std::getline(excludeStream, temp, ','))
+    {
+        excludeACAreasId.insert(atoi(temp.c_str()));
+    }
+
+    LOG_INFO("anticheat", "AntiCheats disabled for %u areas", (uint32)excludeACAreasId.size());
+}
+
 void AnticheatMgr::HandlePlayerLogin(Player* player)
 {
     AnticheatData anticheatData(player);

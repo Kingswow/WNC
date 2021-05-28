@@ -106,3 +106,9 @@ AntiCheats.FlyHackTimer = 3000
 #        Example:     "616,649"
 
 AntiCheats.forceExcludeMapsid = "616,649"
+
+#    AntiCheats.forceExcludeAreasid disabled maps
+#        Description: disabled areas for anticheat system
+#        Example:     "4247,477"
+
+AntiCheats.forceExcludeAreasid = ""

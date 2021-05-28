@@ -74,6 +74,7 @@ public:
     void OnAfterConfigLoad(bool /*reload*/)
     {
         sAnticheatMgr->SetExcludedMaps();
+        sAnticheatMgr->SetExcludedAreas();
     }
 };
 

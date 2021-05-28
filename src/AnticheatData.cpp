@@ -106,7 +106,7 @@ bool AnticheatData::CheckOnFlyHack()
         return true;
     }
 
-    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()))
+    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
     {
         return true;
     }
@@ -232,7 +232,7 @@ bool AnticheatData::CheckMovementInfo(MovementInfo const& movementInfo, Unit* mo
 
 bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover, bool jump)
 {
-    if (!sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()))
+    if (!sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) && !sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
     {
         if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Enabled", true) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
         {
@@ -272,7 +272,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         return true;
     }
 
-    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()))
+    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
     {
         return true;
     }

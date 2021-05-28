@@ -36,6 +36,7 @@ class AnticheatMgr
         static AnticheatMgr* instance();
 
         void SetExcludedMaps();
+        void SetExcludedAreas();
 
         void HandlePlayerLogin(Player* player);
         void HandlePlayerLogout(Player* player);
@@ -54,6 +55,7 @@ class AnticheatMgr
         void UpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
 
         bool isMapDisabledForAC(uint32 mapid) const { return excludeACMapsId.count(mapid); }
+        bool isAreaDisabledForAC(uint32 areaid) const { return excludeACAreasId.count(areaid); }
 
         bool HandleDoubleJump(Player* player, Unit* mover);
         bool CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
@@ -62,6 +64,7 @@ class AnticheatMgr
         AnticheatPlayersDataMap m_Players;
 
         std::unordered_set<uint32> excludeACMapsId;
+        std::unordered_set<uint32> excludeACAreasId;
 };
 
 #define sAnticheatMgr AnticheatMgr::instance()
