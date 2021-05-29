@@ -62,7 +62,7 @@ void AnticheatMgr::SetExcludedAreas()
     LOG_INFO("anticheat", "AntiCheats disabled for %u areas", (uint32)excludeACAreasId.size());
 }
 
-void AnticheatMgr::HandlePlayerLogin(Player* player)
+void AnticheatMgr::HandlePlayerLoadFromDB(Player* player)
 {
     AnticheatData anticheatData(player);
     anticheatData.SetLastMoveClientTimestamp(getMSTime());

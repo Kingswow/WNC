@@ -38,7 +38,7 @@ class AnticheatMgr
         void SetExcludedMaps();
         void SetExcludedAreas();
 
-        void HandlePlayerLogin(Player* player);
+        void HandlePlayerLoadFromDB(Player* player);
         void HandlePlayerLogout(Player* player);
 
         void DeleteCommand(ObjectGuid guid = ObjectGuid::Empty);

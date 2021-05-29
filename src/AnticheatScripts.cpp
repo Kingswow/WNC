@@ -8,9 +8,9 @@ public:
 	{
 	}
 
-    void OnLogin(Player* player) override
+    void OnLoadFromDB(Player* player) override
     {
-        sAnticheatMgr->HandlePlayerLogin(player);
+        sAnticheatMgr->HandlePlayerLoadFromDB(player);
     }
 
 	void OnLogout(Player* player) override

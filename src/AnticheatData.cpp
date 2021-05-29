@@ -96,7 +96,7 @@ bool AnticheatData::CheckOnFlyHack()
         return true;
     }
 
-    if (m_owner->IsFalling() || m_owner->IsFalling())
+    if ((m_owner->movespline->Initialized() && !m_owner->movespline->Finalized()) || m_owner->ToUnit()->IsFalling() || m_owner->IsFalling())
     {
         return true;
     }
