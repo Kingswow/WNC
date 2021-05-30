@@ -162,7 +162,10 @@ bool AnticheatData::CheckOnFlyHack()
     float pz = npos.GetPositionZ();
     if (!m_owner->IsInWater() && m_owner->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
-        float waterlevel = m_owner->GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+        LiquidData liquid_status;
+        m_owner->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, m_owner->GetCollisionHeight());
+
+        float waterlevel = liquid_status.level; // water walking
         bool hovergaura = m_owner->HasAuraType(SPELL_AURA_WATER_WALK) || m_owner->HasAuraType(SPELL_AURA_HOVER);
         if (waterlevel && (pz - waterlevel) <= (hovergaura ? m_owner->GetCollisionHeight() + 2.5f : m_owner->GetCollisionHeight() + 1.5f))
         {
@@ -177,13 +180,16 @@ bool AnticheatData::CheckOnFlyHack()
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, m_owner->GetName().c_str());
         return false;
     }
-    else
+    else if (!m_owner->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         float z = m_owner->GetMap()->GetHeight(m_owner->GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz + m_owner->GetCollisionHeight() + 0.5f, true, 50.0f); // smart flyhacks -> SimpleFly
         float diff = pz - z;
         if (diff > 6.8f) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
         {
-            float waterlevel = m_owner->GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+            LiquidData liquid_status;
+            m_owner->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, m_owner->GetCollisionHeight());
+
+            float waterlevel = liquid_status.level; // water walking
             if (waterlevel && waterlevel + m_owner->GetCollisionHeight() > pz)
             {
                 return true;
