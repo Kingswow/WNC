@@ -240,30 +240,6 @@ bool AnticheatData::CheckMovementInfo(MovementInfo const& movementInfo, Unit* mo
     return false;
 }
 
-inline float tangent(float x)
-{
-    x = std::tan(x);
-    //if (x < std::numeric_limits<float>::max() && x > -std::numeric_limits<float>::max()) return x;
-    //if (x >= std::numeric_limits<float>::max()) return std::numeric_limits<float>::max();
-    //if (x <= -std::numeric_limits<float>::max()) return -std::numeric_limits<float>::max();
-    if (x < 100000.0f && x > -100000.0f)
-    {
-        return x;
-    }
-
-    if (x >= 100000.0f)
-    {
-        return 100000.0f;
-    }
-
-    if (x <= 100000.0f)
-    {
-        return -100000.0f;
-    }
-
-    return 0.0f;
-}
-
 bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover, bool jump)
 {
     if (!sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) && !sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
@@ -374,28 +350,23 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         float distance = npos.GetExactDist2d(m_owner);
         if (!jump && !m_owner->CanFly() && !m_owner->isSwimming() && !transportflag)
         {
-            float deltaZ = fabs(m_owner->GetPositionZ() - movementInfo.pos.GetPositionZ());
-            float deltaXY = distance;
+            float diffz = fabs(movementInfo.pos.GetPositionZ() - m_owner->GetPositionZ());
+            float tanangle = distance / diffz;
 
-            // Prevent divide by 0
-            if (!G3D::fuzzyEq(deltaXY, 0.f))
+            if (movementInfo.pos.GetPositionZ() > m_owner->GetPositionZ() && diffz > 1.87f && tanangle < 0.57735026919f) // 30 degrees
             {
-                float angle = Position::NormalizeOrientation(tangent(deltaZ / deltaXY));
-                if (angle > 1.9f)
-                {
-                    std::string mapname = m_owner->GetMap()->GetMapName();
-                    LOG_INFO("anticheat", "PassiveAnticheat: Climb Hack detected for Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
-                        m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                        m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+                std::string mapname = m_owner->GetMap()->GetMapName();
+                LOG_INFO("anticheat", "PassiveAnticheat: Climb Hack detected for Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
+                    m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
+                    m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
-                    if (sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Kick.Enabled", true))
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                if (sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Kick.Enabled", true))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
                 }
             }
         }
