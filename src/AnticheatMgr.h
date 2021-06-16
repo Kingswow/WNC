@@ -60,6 +60,11 @@ class AnticheatMgr
         bool HandleDoubleJump(Player* player, Unit* mover);
         bool CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
 
+        void ResetFallingData(Player* player);
+        bool NoFallingDamage(Player* player, uint16 opcode);
+        void HandleNoFallingDamage(Player* player, uint16 opcode);
+        void SetSuccessfullyLanded(Player* player);
+
     private:
         AnticheatPlayersDataMap m_Players;
 

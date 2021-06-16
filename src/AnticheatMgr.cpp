@@ -65,8 +65,8 @@ void AnticheatMgr::SetExcludedAreas()
 void AnticheatMgr::HandlePlayerLoadFromDB(Player* player)
 {
     AnticheatData anticheatData(player);
-    anticheatData.SetLastMoveClientTimestamp(getMSTime());
-    anticheatData.SetLastMoveServerTimestamp(getMSTime());
+    anticheatData.SetLastMoveClientTimestamp(World::GetGameTimeMS());
+    anticheatData.SetLastMoveServerTimestamp(World::GetGameTimeMS());
 
     m_Players[player->GetGUID()] = std::move(anticheatData);
 }
@@ -183,3 +183,41 @@ bool AnticheatMgr::CheckMovementInfo(Player* player, MovementInfo const& movemen
     return true;
 }
 
+void AnticheatMgr::ResetFallingData(Player* player)
+{
+    auto itr = m_Players.find(player->GetGUID());
+    if (itr != m_Players.end())
+    {
+        itr->second.ResetFallingData();
+    }
+}
+
+bool AnticheatMgr::NoFallingDamage(Player* player, uint16 opcode)
+{
+    auto itr = m_Players.find(player->GetGUID());
+    if (itr != m_Players.end())
+    {
+        return itr->second.NoFallingDamage(opcode);
+    }
+
+    return true;
+}
+
+void AnticheatMgr::HandleNoFallingDamage(Player* player, uint16 opcode)
+{
+    auto itr = m_Players.find(player->GetGUID());
+    if (itr != m_Players.end())
+    {
+        itr->second.HandleNoFallingDamage(opcode);
+    }
+}
+
+void AnticheatMgr::SetSuccessfullyLanded(Player* player)
+{
+    auto itr = m_Players.find(player->GetGUID());
+    if (itr != m_Players.end())
+    {
+        if (itr->second.IsWaitingLandOrSwimOpcode() || itr->second.IsUnderLastChanceForLandOrSwimOpcode())
+            itr->second.SetSuccessfullyLanded();
+    }
+}

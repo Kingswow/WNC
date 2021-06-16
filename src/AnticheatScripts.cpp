@@ -62,6 +62,26 @@ public:
     {
         return sAnticheatMgr->CheckMovementInfo(player, movementInfo, mover, jump);
     }
+
+    void AnticheatResetFallingData(Player* player) override
+    {
+        sAnticheatMgr->ResetFallingData(player);
+    }
+
+    bool AnticheatNoFallingDamage(Player* player, uint16 opcode) override
+    {
+        return sAnticheatMgr->NoFallingDamage(player, opcode);
+    }
+
+    void AnticheatHandleNoFallingDamage(Player* player, uint16 opcode) override
+    {
+        sAnticheatMgr->HandleNoFallingDamage(player, opcode);
+    }
+
+    void AnticheatSetSuccessfullyLanded(Player* player) override
+    {
+        sAnticheatMgr->SetSuccessfullyLanded(player);
+    }
 };
 
 class AnticheatWorldScript : public WorldScript

@@ -41,21 +41,47 @@ class AnticheatData
 
         bool HandleDoubleJump(Unit* mover);
 
+        void ResetFallingData();
+
+        std::string GetDescriptionACForLogs(uint8 type, float param1 = 0.f, float param2 = 0.f) const;
+        std::string GetPositionACForLogs() const;
+
+        void StartWaitingLandOrSwimOpcode();
+        bool IsWaitingLandOrSwimOpcode() const { return m_antiNoFallDmg; }
+        bool IsUnderLastChanceForLandOrSwimOpcode() const { return m_antiNoFallDmgLastChance; }
+        void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; }
+        // END AntiCheat system
+
+        // Walking data from move packets
+        void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
+        bool HasWalkingFlag() const { return m_walking; }
+
+        bool NoFallingDamage(uint16 opcode);
+        void HandleNoFallingDamage(uint16 opcode);
+
+        void RecordAntiCheatLog(std::string const& description);
+
     private:
         Player* m_owner;
+
         uint32 m_flyhackTimer;
         uint32 m_mountTimer;
         uint32 m_rootUpdTimer;
-        bool   m_ACKmounted;
-        bool   m_rootUpd;
+        uint32 m_antiNoFallDmgTimer;
+
         // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
         uint32 lastMoveClientTimestamp;
         // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
         uint32 lastMoveServerTimestamp;
 
+        bool m_ACKmounted;
+        bool m_rootUpd;
         bool m_skipOnePacketForASH; // Used for skip 1 movement packet after charge or blink
         bool m_isjumping;           // Used for jump-opcode in movementhandler
         bool m_canfly;              // Used for access at fly flag - handled restricted access
+        bool m_antiNoFallDmg;
+        bool m_antiNoFallDmgLastChance;
+        bool m_walking;             // Player walking
 };
 
 #endif
