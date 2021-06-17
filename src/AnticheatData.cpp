@@ -590,7 +590,7 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
 
 void AnticheatData::RecordAntiCheatLog(std::string const& description)
 {
-    LoginDatabase.DirectPExecute("INSERT INTO anticheat_logs (account, player, description, position, realmId) VALUES (%d, %s, %s, %s, %d)",
+    LoginDatabase.PExecute("INSERT INTO anticheat_logs (account, player, description, position, realmId) VALUES (%d, '%s', '%s', '%s', %d)",
         m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), description.c_str(), GetPositionACForLogs().c_str(), int32(realm.Id.Realm));
 }
 
