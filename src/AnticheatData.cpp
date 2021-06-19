@@ -186,7 +186,7 @@ bool AnticheatData::CheckOnFlyHack()
 
         float waterlevel = liquid_status.level; // water walking
         bool hovergaura = m_owner->HasAuraType(SPELL_AURA_WATER_WALK) || m_owner->HasAuraType(SPELL_AURA_HOVER);
-        if (waterlevel && (pz - waterlevel) <= (hovergaura ? m_owner->GetCollisionHeight() + 1.5f : m_owner->GetCollisionHeight() + 1.5f))
+        if (waterlevel > INVALID_HEIGHT && (pz - waterlevel) <= (hovergaura ? m_owner->GetCollisionHeight() + 1.5f : m_owner->GetCollisionHeight() + 1.5f))
         {
             return true;
         }
@@ -204,37 +204,40 @@ bool AnticheatData::CheckOnFlyHack()
     else if (!m_owner->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         float z = m_owner->GetMap()->GetHeight(m_owner->GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz + m_owner->GetCollisionHeight() + 0.5f, true, 50.0f); // smart flyhacks -> SimpleFly
-        float diff = pz - z;
-        if (diff > 6.8f) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
+        if (z > INVALID_HEIGHT)
         {
-            LiquidData liquid_status;
-            m_owner->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, m_owner->GetCollisionHeight());
-
-            float waterlevel = liquid_status.level; // water walking
-            if (waterlevel && waterlevel + m_owner->GetCollisionHeight() > pz)
+            float diff = pz - z;
+            if (diff > 6.8f) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
             {
-                return true;
-            }
+                LiquidData liquid_status;
+                m_owner->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, m_owner->GetCollisionHeight());
 
-            float cx, cy, cz;
-            m_owner->GetTheClosestPoint(cx, cy, cz, 0.5, pz, 6.8f); // first check
-            if (pz - cz > 6.8f)
-            {
-                m_owner->GetMap()->getObjectHitPos(m_owner->GetPhaseMask(), m_owner->GetPositionX(), m_owner->GetPositionY(),
-                    m_owner->GetPositionZ() + m_owner->GetCollisionHeight(), cx, cy, cz + m_owner->GetCollisionHeight(), cx, cy, cz, -m_owner->GetCollisionHeight());
+                float waterlevel = liquid_status.level; // water walking
+                if (waterlevel > INVALID_HEIGHT && waterlevel + m_owner->GetCollisionHeight() > pz)
+                {
+                    return true;
+                }
+
+                float cx, cy, cz;
+                m_owner->GetTheClosestPoint(cx, cy, cz, 0.5, pz, 6.8f); // first check
                 if (pz - cz > 6.8f)
                 {
-                    LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
-                        m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                        m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
-                    LOG_INFO("anticheat", "Player::========================================================");
-                    LOG_INFO("anticheat", "playerZ = %f", pz);
-                    LOG_INFO("anticheat", "normalZ = %f", z);
-                    LOG_INFO("anticheat", "checkz = %f", cz);
-                    LOG_INFO("anticheat", "========================================================");
-                    sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, m_owner->GetName().c_str());
-                    RecordAntiCheatLog(GetDescriptionACForLogs(3, pz, z));
-                    return false;
+                    m_owner->GetMap()->getObjectHitPos(m_owner->GetPhaseMask(), m_owner->GetPositionX(), m_owner->GetPositionY(),
+                        m_owner->GetPositionZ() + m_owner->GetCollisionHeight(), cx, cy, cz + m_owner->GetCollisionHeight(), cx, cy, cz, -m_owner->GetCollisionHeight());
+                    if (pz - cz > 6.8f)
+                    {
+                        LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
+                            m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
+                            m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+                        LOG_INFO("anticheat", "Player::========================================================");
+                        LOG_INFO("anticheat", "playerZ = %f", pz);
+                        LOG_INFO("anticheat", "normalZ = %f", z);
+                        LOG_INFO("anticheat", "checkz = %f", cz);
+                        LOG_INFO("anticheat", "========================================================");
+                        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, m_owner->GetName().c_str());
+                        RecordAntiCheatLog(GetDescriptionACForLogs(3, pz, z));
+                        return false;
+                    }
                 }
             }
         }
