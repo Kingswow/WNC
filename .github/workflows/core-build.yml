@@ -1,6 +1,8 @@
 name: core-build
 on:
   push:
+    branches:
+      - 'master'
   pull_request:
 
 jobs:
@@ -8,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang, clang11]
+        compiler: [clang]
     runs-on: ubuntu-latest
     name: ${{ matrix.compiler }}
     env:
@@ -26,7 +28,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
+          path: var/ccache
           key: ccache:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.compiler }}:${{ github.ref }}
