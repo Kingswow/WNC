@@ -572,7 +572,7 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
         {
             LOG_INFO("anticheat", "PassiveAnticheat: NoFallingDamage by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
                 m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
-                m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+                m_owner->GetMapId(), m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
             sWorld->SendGMText(LANG_GM_ANNOUNCE_NOFALLINGDMG, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str());
 
