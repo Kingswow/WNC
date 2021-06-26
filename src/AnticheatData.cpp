@@ -474,7 +474,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         normaldistance = (runspeed * difftime) + 0.002f; // 0.002f a little safe temporary hack
         if (UnderACKmount())
             normaldistance += 20.0f;
-        if (distance < normaldistance)
+
+        if (normaldistance - distance >= -1.5f)
             return true;
 
         ping = uint32(diffPacketdelay * 10000.f);
