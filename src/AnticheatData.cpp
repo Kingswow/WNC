@@ -271,46 +271,48 @@ bool AnticheatData::CheckMovementInfo(MovementInfo const& movementInfo, Unit* mo
 
 bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover, bool jump)
 {
-    if (!sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) && !sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
+    if (m_owner->movespline->Initialized() && !m_owner->movespline->Finalized())
     {
-        if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Enabled", true) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
-        {
-            if (!IsJumpingbyOpcode() && !UnderACKmount() && !m_owner->IsFlying())
-            {
-                // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
-                LOG_INFO("anticheat", "PassiveAnticheat: Fake jumper by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
-                    m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                    m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
-                sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, m_owner->GetName().c_str());
-                RecordAntiCheatLog(GetDescriptionACForLogs(7));
-                if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Kick.Enabled", true))
-                {
-                    return false;
-                }
-            }
-        }
+        return true;
+    }
 
-        if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Enabled", true) && !IsCanFlybyServer() && !UnderACKmount() &&
-            movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !m_owner->IsInWater())
+    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
+    {
+        return true;
+    }
+
+    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Enabled", true) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+    {
+        if (!IsJumpingbyOpcode() && !UnderACKmount() && !m_owner->IsFlying())
         {
-            LOG_INFO("anticheat", "PassiveAnticheat: Fake flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
+            // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
+            LOG_INFO("anticheat", "PassiveAnticheat: Fake jumper by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
                 m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
                 m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
-            sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, m_owner->GetName().c_str());
-            RecordAntiCheatLog(GetDescriptionACForLogs(8));
-            if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Kick.Enabled", true))
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, m_owner->GetName().c_str());
+            RecordAntiCheatLog(GetDescriptionACForLogs(7));
+            if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Kick.Enabled", true))
             {
                 return false;
             }
         }
     }
 
-    if (!sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Enabled", true))
+    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Enabled", true) && !IsCanFlybyServer() && !UnderACKmount() &&
+        movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !m_owner->IsInWater())
     {
-        return true;
+        LOG_INFO("anticheat", "PassiveAnticheat: Fake flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
+            m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
+            m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, m_owner->GetName().c_str());
+        RecordAntiCheatLog(GetDescriptionACForLogs(8));
+        if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Kick.Enabled", true))
+        {
+            return false;
+        }
     }
 
-    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
+    if (!sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Enabled", true))
     {
         return true;
     }
@@ -406,7 +408,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         // calculate distance - don't use func, because x,z can be offset transport coords
         distance = sqrt((npos.GetPositionY() - y) * (npos.GetPositionY() - y) + (npos.GetPositionX() - x) * (npos.GetPositionX() - x));
 
-        if (!jump && !m_owner->CanFly() && !m_owner->isSwimming() && !transportflag)
+        if (!jump && !m_owner->CanFly() && !m_owner->isSwimming() && !transportflag && distance > 0.f)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - z);
             float tanangle = distance / diffz;
@@ -528,12 +530,21 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
     SetJumpingbyOpcode(true);
     SetUnderACKmount();
 
+    if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
+    {
+        return true;
+    }
+
     if (mover->IsFalling())
     {
         LOG_INFO("anticheat", "PassiveAnticheat: Double jump by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+
         sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, m_owner->GetName().c_str());
+
+        RecordAntiCheatLog(GetDescriptionACForLogs(6));
+
         if (sConfigMgr->GetOption<bool>("AntiCheats.DoubleJump.Enabled", true))
         {
             return false;
@@ -556,6 +567,12 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
 {
     if (IsUnderLastChanceForLandOrSwimOpcode())
     {
+        if (sAnticheatMgr->isMapDisabledForAC(m_owner->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(m_owner->GetAreaId()))
+        {
+            SetSuccessfullyLanded();
+            return true;
+        }
+
         bool checkNorm = false;
         switch (opcode)
         {
