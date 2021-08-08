@@ -8,7 +8,7 @@
 
 #define DEFAULT_PLAYER_BOUNDING_RADIUS      0.388999998569489f     // player size, also currently used (correctly?) for any non Unit world objects
 
-AnticheatData::AnticheatData(Player* player /* =nullptr*/) : m_owner(player)
+AnticheatData::AnticheatData(Player* player, uint32 time) : m_owner(player)
 {
     m_flyhackTimer = 0;
     if (sConfigMgr->GetOption<bool>("AntiCheats.FlyHack.Enabled", true))
@@ -27,8 +27,12 @@ AnticheatData::AnticheatData(Player* player /* =nullptr*/) : m_owner(player)
     m_antiNoFallDmg = false;
     m_antiNoFallDmgLastChance = false;
     m_walking = false;
-    lastMoveClientTimestamp = 0;
-    lastMoveServerTimestamp = 0;
+    lastMoveClientTimestamp = time;
+    lastMoveServerTimestamp = time;
+
+    m_loadedFromDB = false;
+    if (player && LoginDatabase.PQuery("SELECT 1 FROM `anticheat_logs` WHERE `guid`=%d", player->GetGUID().GetCounter()))
+        m_loadedFromDB = true;
 }
 
 AnticheatData::~AnticheatData()
@@ -37,6 +41,9 @@ AnticheatData::~AnticheatData()
 
 void AnticheatData::Update(uint32 time)
 {
+    if (m_owner->movespline->Initialized() && !m_owner->movespline->Finalized())
+        return;
+
     if (m_flyhackTimer > 0)
     {
         if (time >= m_flyhackTimer)
@@ -114,7 +121,7 @@ bool AnticheatData::CheckOnFlyHack()
         return true;
     }
 
-    if ((m_owner->movespline->Initialized() && !m_owner->movespline->Finalized()) || m_owner->ToUnit()->IsFalling() || m_owner->IsFalling())
+    if (m_owner->ToUnit()->IsFalling() || m_owner->IsFalling())
     {
         return true;
     }
@@ -138,26 +145,11 @@ bool AnticheatData::CheckOnFlyHack()
         LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, m_owner->GetName().c_str());
-        RecordAntiCheatLog(GetDescriptionACForLogs(1));
+        RecordAntiCheatLog(FLY_HACK);
         return false;
     }
 
     if (m_owner->IsFlying() || m_owner->IsLevitating() || m_owner->IsInFlight())
-    {
-        return true;
-    }
-
-    if (m_owner->GetVehicle() || m_owner->GetVehicleKit())
-    {
-        return true;
-    }
-
-    if (m_owner->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
-    {
-        return true;
-    }
-
-    if (m_owner->GetTransport() || m_owner->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
         return true;
     }
@@ -198,7 +190,7 @@ bool AnticheatData::CheckOnFlyHack()
         LOG_INFO("anticheat", "Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, m_owner->GetName().c_str());
-        RecordAntiCheatLog(GetDescriptionACForLogs(2));
+        RecordAntiCheatLog(FLY_HACK);
         return false;
     }
     else if (!m_owner->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
@@ -235,7 +227,7 @@ bool AnticheatData::CheckOnFlyHack()
                         LOG_INFO("anticheat", "checkz = %f", cz);
                         LOG_INFO("anticheat", "========================================================");
                         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, m_owner->GetName().c_str());
-                        RecordAntiCheatLog(GetDescriptionACForLogs(3, pz, z));
+                        RecordAntiCheatLog(FLY_HACK);
                         return false;
                     }
                 }
@@ -290,7 +282,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                 m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
                 m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, m_owner->GetName().c_str());
-            RecordAntiCheatLog(GetDescriptionACForLogs(7));
+            RecordAntiCheatLog(FAKE_JUMP);
             if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Kick.Enabled", true))
             {
                 return false;
@@ -305,7 +297,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), m_owner->GetMapId(),
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, m_owner->GetName().c_str());
-        RecordAntiCheatLog(GetDescriptionACForLogs(8));
+        RecordAntiCheatLog(FAKE_FLY);
         if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Kick.Enabled", true))
         {
             return false;
@@ -328,11 +320,6 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         bool vehicle = false;
         if (m_owner->GetVehicleKit() && m_owner->GetVehicleKit()->GetBase())
             vehicle = true;
-
-        if (m_owner->GetVehicle())
-        {
-            return true;
-        }
 
         if (m_owner->m_mover != m_owner)
         {
@@ -390,7 +377,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                         m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
                         m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
                     sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str());
-                    RecordAntiCheatLog(GetDescriptionACForLogs(4));
+                    RecordAntiCheatLog(IGNORE_CONTROL);
 
                     if (sConfigMgr->GetOption<bool>("AntiCheats.MoveUnderControl.Kick.Enabled", true))
                     {
@@ -420,7 +407,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                     m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), m_owner->GetMapId(), x, y, z);
-                RecordAntiCheatLog(GetDescriptionACForLogs(5, diffz, distance));
+                RecordAntiCheatLog(CLIMB_HACK);
 
                 if (sConfigMgr->GetOption<bool>("AntiCheats.Wallclimb.Kick.Enabled", true))
                 {
@@ -501,7 +488,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         LOG_INFO("anticheat", "========================================================");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, m_owner->GetName().c_str(), normaldistance, distance);
-        RecordAntiCheatLog(GetDescriptionACForLogs(0, distance, normaldistance));
+        RecordAntiCheatLog(SPEED_HACK);
     }
     else
     {
@@ -536,6 +523,11 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
         return true;
     }
 
+    if (m_owner->movespline->Initialized() && !m_owner->movespline->Finalized())
+    {
+        return true;
+    }
+
     if (mover->IsFalling())
     {
         LOG_INFO("anticheat", "PassiveAnticheat: Double jump by Account id : %u, Player %s (%s), Map: %d, Position: %s, MovementFlags: %d",
@@ -544,7 +536,7 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, m_owner->GetName().c_str());
 
-        RecordAntiCheatLog(GetDescriptionACForLogs(6));
+        RecordAntiCheatLog(DOUBLE_JUMP);
 
         if (sConfigMgr->GetOption<bool>("AntiCheats.DoubleJump.Enabled", true))
         {
@@ -574,6 +566,12 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
             return true;
         }
 
+        if (m_owner->movespline->Initialized() && !m_owner->movespline->Finalized())
+        {
+            SetSuccessfullyLanded();
+            return true;
+        }
+
         bool checkNorm = false;
         switch (opcode)
         {
@@ -594,7 +592,7 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
 
             sWorld->SendGMText(LANG_GM_ANNOUNCE_NOFALLINGDMG, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str());
 
-            RecordAntiCheatLog(GetDescriptionACForLogs(9));
+            RecordAntiCheatLog(NO_FALLING);
 
             if (sConfigMgr->GetOption<bool>("AntiCheats.NoFallingDmg.Kick.Enabled", false))
             {
@@ -609,10 +607,47 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
     return true;
 }
 
-void AnticheatData::RecordAntiCheatLog(std::string const& description)
+void AnticheatData::RecordAntiCheatLog(CheatTypes cheatType)
 {
-    LoginDatabase.PExecute("INSERT INTO anticheat_logs (account, player, description, position, realmId) VALUES (%d, '%s', '%s', '%s', %d)",
-        m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), description.c_str(), GetPositionACForLogs().c_str(), int32(realm.Id.Realm));
+    std::string cheatColumn;
+    switch (cheatType)
+    {
+        case FLY_HACK:
+            cheatColumn = "flyHacks";
+            break;
+        case SPEED_HACK:
+            cheatColumn = "speedHacks";
+            break;
+        case DOUBLE_JUMP:
+            cheatColumn = "doubleJumps";
+            break;
+        case FAKE_JUMP:
+            cheatColumn = "fakeJumps";
+            break;
+        case FAKE_FLY:
+            cheatColumn = "fakeFly";
+            break;
+        case IGNORE_CONTROL:
+            cheatColumn = "ignoreControls";
+            break;
+        case CLIMB_HACK:
+            cheatColumn = "climbHacks";
+            break;
+        case NO_FALLING:
+            cheatColumn = "noFalling";
+            break;
+    }
+
+    if (m_loadedFromDB)
+    {
+        LoginDatabase.PExecute("UPDATE `anticheat_logs` SET %s=%s + 1 WHERE `guid`=%d", cheatColumn, cheatColumn, m_owner->GetGUID().GetCounter());
+    }
+    else
+    {
+        m_loadedFromDB = true;
+        LoginDatabase.PExecute("INSERT INTO anticheat_logs (`account`, `guid`, `player`, %s) VALUES (%d, %d, '%s', 1)",
+            cheatColumn, m_owner->GetSession()->GetAccountId(), m_owner->GetGUID().GetCounter(), m_owner->GetName().c_str());
+    }
 }
 
 void AnticheatData::HandleNoFallingDamage(uint16 opcode)
@@ -631,85 +666,4 @@ void AnticheatData::HandleNoFallingDamage(uint16 opcode)
         if (!checkNorm && !IsWaitingLandOrSwimOpcode())
             StartWaitingLandOrSwimOpcode();
     }
-}
-
-std::string AnticheatData::GetDescriptionACForLogs(uint8 type, float param1, float param2) const
-{
-    std::ostringstream str;
-
-    switch (type)
-    {
-        case 0: // ASH
-        {
-            str << "AntiSpeedHack: distance from packet = " << param1 << ", available distance = " << param2;
-            break;
-        }
-        case 1: // AFH - IsFlying but CanFly is false
-        {
-            str << "AntiFlyHack: Player IsFlying but CanFly is false";
-            break;
-        }
-        case 2: // AFH - Player has a MOVEMENTFLAG_SWIMMING, but not in water
-        {
-            str << "AntiFlyHack: Player has a MOVEMENTFLAG_SWIMMING, but not in water";
-            break;
-        }
-        case 3: // AFH - just z checks (smaughack)
-        {
-            str << "AntiFlyHack: Player::CheckOnFlyHack : playerZ = " << param1 << ", but normalZ = " << param2;
-            break;
-        }
-        case 4: // Ignore control Hack
-        {
-            str << "Ignore controll Hack detected";
-            break;
-        }
-        case 5: // Climb-Hack
-        {
-            str << "Climb-Hack detected , diffZ = " << param1 << ", distance = " << param2;
-            break;
-        }
-        case 6: // doublejumper
-        {
-            str << "Double-jump detected";
-            break;
-        }
-        case 7: // fakejumper
-        {
-            str << "FakeJumper detected";
-            break;
-        }
-        case 8: // fakeflying
-        {
-            str << "FakeFlying mode detected";
-            break;
-        }
-        case 9: // NoFallingDmg
-        {
-            str << "NoFallingDamage mode detected";
-            break;
-        }
-        default:
-            break;
-    }
-
-    return str.str();
-}
-
-std::string AnticheatData::GetPositionACForLogs() const
-{
-    uint32 areaId = m_owner->GetAreaId();
-    std::string areaName = "Unknown";
-    std::string zoneName = "Unknown";
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
-    {
-        int locale = m_owner->GetSession()->GetSessionDbcLocale();
-        areaName = area->area_name[locale];
-        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone))
-            zoneName = zone->area_name[locale];
-    }
-
-    std::ostringstream str;
-    str << "Map: " << m_owner->GetMapId() << " (" << (m_owner->FindMap() ? m_owner->FindMap()->GetMapName() : "Unknown") << ") Area: " << areaId << " (" << areaName.c_str() << ") Zone: " << zoneName.c_str() << " XYZ: " << m_owner->GetPositionX() << " " << m_owner->GetPositionY() << " " << m_owner->GetPositionZ();
-    return str.str();
 }
