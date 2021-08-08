@@ -64,10 +64,7 @@ void AnticheatMgr::SetExcludedAreas()
 
 void AnticheatMgr::HandlePlayerLoadFromDB(Player* player)
 {
-    AnticheatData anticheatData(player);
-    anticheatData.SetLastMoveClientTimestamp(World::GetGameTimeMS());
-    anticheatData.SetLastMoveServerTimestamp(World::GetGameTimeMS());
-
+    AnticheatData anticheatData(player, World::GetGameTimeMS());
     m_Players[player->GetGUID()] = std::move(anticheatData);
 }
 

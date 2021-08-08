@@ -8,10 +8,22 @@ class Unit;
 
 struct MovementInfo;
 
+enum CheatTypes
+{
+    FLY_HACK    = 0,
+    SPEED_HACK,
+    DOUBLE_JUMP,
+    FAKE_JUMP,
+    FAKE_FLY,
+    IGNORE_CONTROL,
+    CLIMB_HACK,
+    NO_FALLING
+};
+
 class AnticheatData
 {
     public:
-        AnticheatData(Player* player = nullptr);
+        AnticheatData(Player* player = nullptr, uint32 time = 0);
         ~AnticheatData();
 
         void Update(uint32 time);
@@ -43,9 +55,6 @@ class AnticheatData
 
         void ResetFallingData();
 
-        std::string GetDescriptionACForLogs(uint8 type, float param1 = 0.f, float param2 = 0.f) const;
-        std::string GetPositionACForLogs() const;
-
         void StartWaitingLandOrSwimOpcode();
         bool IsWaitingLandOrSwimOpcode() const { return m_antiNoFallDmg; }
         bool IsUnderLastChanceForLandOrSwimOpcode() const { return m_antiNoFallDmgLastChance; }
@@ -59,7 +68,7 @@ class AnticheatData
         bool NoFallingDamage(uint16 opcode);
         void HandleNoFallingDamage(uint16 opcode);
 
-        void RecordAntiCheatLog(std::string const& description);
+        void RecordAntiCheatLog(CheatTypes cheatType);
 
     private:
         Player* m_owner;
@@ -82,6 +91,8 @@ class AnticheatData
         bool m_antiNoFallDmg;
         bool m_antiNoFallDmgLastChance;
         bool m_walking;             // Player walking
+
+        bool m_loadedFromDB;
 };
 
 #endif
