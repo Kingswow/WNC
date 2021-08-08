@@ -219,7 +219,7 @@ bool AnticheatData::CheckOnFlyHack()
                 }
 
                 float cx, cy, cz;
-                m_owner->GetClosePoint(cx, cy, cz, 0.5, pz, 6.8f); // first check
+                m_owner->GetTheClosestPoint(cx, cy, cz, 0.5, pz, 6.8f); // first check
                 if (pz - cz > 6.8f)
                 {
                     m_owner->GetMap()->GetObjectHitPos(m_owner->GetPhaseMask(), m_owner->GetPositionX(), m_owner->GetPositionY(),
