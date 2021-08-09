@@ -12786,8 +12786,6 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
     if (Player* player = ToPlayer())
     {
-        sScriptMgr->AnticheatSetUnderACKmount(player);
-
         // mount as a vehicle
         if (VehicleId)
         {
@@ -12831,6 +12829,8 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         data << uint32(sWorld->GetGameTime());   // Packet counter
         data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
+
+        sScriptMgr->AnticheatSetUnderACKmount(player);
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -18395,6 +18395,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
             player->SetCanFly(true, true);
 
         sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+        sScriptMgr->AnticheatSetUnderACKmount(player);
     }
 }
 
@@ -18738,6 +18739,9 @@ void Unit::JumpTo(float speedXY, float speedZ, bool forward)
         data << float(-speedZ);                                 // Z Movement speed (vertical)
 
         ToPlayer()->GetSession()->SendPacket(&data);
+
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        sScriptMgr->AnticheatSetUnderACKmount(ToPlayer());
     }
 }
 
@@ -18941,12 +18945,6 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     //! init spline movement based on those coordinates in unapply handlers, and
     //! relocate exiting passengers based on Unit::moveSpline data. Either way,
     //! Coming Soon(TM)
-
-    if (Player* player = ToPlayer())
-    {
-        sScriptMgr->AnticheatSetUnderACKmount(player);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
-    }
 }
 
 bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
@@ -19003,7 +19001,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     if (player)
     {
-        player->SetFallInformation(time(nullptr), GetPositionZ());
+        player->ResetFallingData(GetPositionZ());
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
         sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);

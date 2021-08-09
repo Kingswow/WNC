@@ -1094,14 +1094,14 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    float speedXY, speedZ;
-    CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
-    m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
-
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
     }
+
+    float speedXY, speedZ;
+    CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
+    m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
 }
 
 void Spell::EffectJumpDest(SpellEffIndex effIndex)
@@ -1122,6 +1122,11 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (!Acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         return;
 
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
+
     float speedXY, speedZ;
     float dist = m_caster->GetExactDist2d(x, y);
     CalculateJumpSpeeds(effIndex, dist, speedXY, speedZ);
@@ -1131,12 +1136,6 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     {
         speedXY = pow(speedZ * 10, 8);
         m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, 0, ObjectAccessor::GetUnit(*m_caster, m_caster->GetGuidValue(UNIT_FIELD_TARGET)));
-
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
-        }
-
         return;
     }
 
@@ -1151,11 +1150,6 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
         speedXY = 1.0f;
 
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
-
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-    {
-        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
-    }
 }
 
 void Spell::CalculateJumpSpeeds(uint8 i, float dist, float& speedXY, float& speedZ)
@@ -1176,11 +1170,6 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
 
     if (!unitTarget || unitTarget->IsInFlight())
         return;
-
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-    {
-        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
-    }
 
     // Pre effects
     switch (m_spellInfo->Id)
@@ -5033,14 +5022,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!unitTarget)
             return;
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
-        }
-
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
-            m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
+            m_caster->ToPlayer()->ResetFallingData(m_caster->GetPositionZ());
 
         if (m_pathFinder)
         {
@@ -5093,11 +5077,6 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
 
-    if (m_caster->ToPlayer())
-    {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
-    }
-
     if (m_targets.HasDst())
     {
         Position pos;
@@ -5111,11 +5090,6 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         }
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
-        }
     }
 }
 
@@ -5169,11 +5143,6 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     }
 
     unitTarget->KnockbackFrom(x, y, speedxy, speedz);
-
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-    {
-        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
-    }
 }
 
 void Spell::EffectLeapBack(SpellEffIndex effIndex)
@@ -5184,19 +5153,19 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.0f;
-    float speedz = damage / 10.0f;
-    //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
-
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
     }
 
+    float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.0f;
+    float speedz = damage / 10.0f;
+    //1891: Disengage
+    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
+
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
+        m_caster->ToPlayer()->ResetFallingData(m_caster->GetPositionZ());
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)
@@ -5275,16 +5244,15 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
         pos.Relocate(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 1.0f, m_caster->GetOrientation());
     }
 
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
+
     float speedXY = float(m_spellInfo->Effects[effIndex].MiscValue) * 0.1f;
     float speedZ = unitTarget->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
 
     unitTarget->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
-
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-    {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(unitTarget->ToPlayer(), true);
-        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
-    }
 }
 
 void Spell::EffectDispelMechanic(SpellEffIndex effIndex)

@@ -319,6 +319,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
+    if (!sScriptMgr->AnticheatNoFallingDamage(_player, opcode))
+    {
+        plrMover->GetSession()->KickPlayer();
+        recvData.rfinish();
+        return;
+    }
+
     /* extract packet */
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -341,21 +348,22 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    // [CMSG_MOVE_CHNG_TRANSPORT 0x038D (909)]
+    if (opcode == CMSG_MOVE_CHNG_TRANSPORT)
+    {
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+    }
+
     if (!movementInfo.pos.IsPositionValid())
     {
-        if (plrMover)
-        {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-            sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-        }
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+        sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
-        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
     if (!mover->movespline->Finalized())
     {
-        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
@@ -365,13 +373,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // Xinef: skip moving packets
         if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-            }
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
+
             return;
         }
+
         movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
         if (mover->GetTypeId() == TYPEID_UNIT)
@@ -387,26 +394,18 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
-            }
-            recvData.rfinish();                 // prevent warnings spam
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
+
             return;
         }
 
         if (!Acore::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
                                     movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-            }
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
-            recvData.rfinish();                   // prevent warnings spam
             return;
         }
 
@@ -460,8 +459,18 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
+    // start falling time
+    if (plrMover && !plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) && movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+        plrMover->ResetFallingData(movementInfo.pos.GetPositionZ());
+
+    // check on NoFallingDamage
+    if (plrMover && plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) && !movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+    {
+        sScriptMgr->AnticheatHandleNoFallingDamage(plrMover, opcode);
+    }
+
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
+    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight() && !plrMover->IsFlying())
     {
         plrMover->HandleFall(movementInfo);
 
@@ -473,9 +482,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
 
+        sScriptMgr->AnticheatSetSuccessfullyLanded(_player);
+        sScriptMgr->AnticheatSetJumpingbyOpcode(_player, false);
+
         if (plrMover)
         {
-            sScriptMgr->AnticheatSetJumpingbyOpcode(plrMover, false);
+            plrMover->ResetFallingData(movementInfo.pos.GetPositionZ()); // for MSG_MOVE_START_SWIM (no HandleFall(movementInfo))
         }
     }
 
@@ -489,17 +501,17 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_JUMP)
     {
         jumpopcode = true;
-        if (plrMover && !sScriptMgr->AnticheatHandleDoubleJump(plrMover, mover))
+        if (!sScriptMgr->AnticheatHandleDoubleJump(_player, mover))
         {
-            plrMover->GetSession()->KickPlayer();
+            KickPlayer();
             return;
         }
     }
 
     /* start some hack detection */
-    if (plrMover && !sScriptMgr->AnticheatCheckMovementInfo(plrMover, movementInfo, mover, jumpopcode))
+    if (!sScriptMgr->AnticheatCheckMovementInfo(_player, movementInfo, mover, jumpopcode))
     {
-        plrMover->GetSession()->KickPlayer();
+        KickPlayer();
         return;
     }
 
@@ -544,7 +556,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (plrMover->IsSitState() && (movementInfo.flags & (MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_TURNING)))
             plrMover->SetStandState(UNIT_STAND_STATE_STAND);
 
-        plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        if (!movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+            plrMover->UpdateFallInformationIfNeed(movementInfo.pos.GetPositionZ()); // don't use SetFallInformation
 
         if (movementInfo.pos.GetPositionZ() < plrMover->GetMap()->GetMinHeight(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY()))
             if (!plrMover->GetBattleground() || !plrMover->GetBattleground()->HandlePlayerUnderMap(_player))
