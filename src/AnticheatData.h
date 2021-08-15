@@ -17,7 +17,8 @@ enum CheatTypes
     FAKE_FLY,
     IGNORE_CONTROL,
     CLIMB_HACK,
-    NO_FALLING
+    NO_FALLING,
+    WATERWALK
 };
 
 class AnticheatData
