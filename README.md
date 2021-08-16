@@ -1,24 +1,29 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 ## Anticheat Module
-- Latest build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-anticheat/workflows/core-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/mod-anticheat)
+- Latest build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-anticheat/workflows/core-build/badge.svg?branch=master&event=push)](https://github.com/Kingswow/WNC/tree/NewAnticheat)
 
 This is a port of the PassiveAnticheat Script from lordpsyan's repo to [AzerothCore](http://www.azerothcore.org)
 
 ## How to install
 
-### 1) Simply place the module under the `modules` folder of your AzerothCore source folder.
+### 1) First Download Master Branch.
+
+`git clone https://github.com/Kingswow/WNC.git master`
+
+
+### 2) Simply place the module under the `modules` folder of your AzerothCore source folder.
 
 You can do clone it via git under the azerothcore/modules directory:
 
 `cd path/to/azerothcore/modules`
 
-`git clone https://github.com/azerothcore/mod-anticheat.git`
+`git clone https://github.com/Kingswow/WNC.git NewAnticheat`
 
-or you can manually [download the module](https://github.com/azerothcore/mod-anticheat/archive/master.zip), unzip and place it under the `azerothcore/modules` directory.
+or you can manually [download the module](https://github.com/Kingswow/WNC/archive/refs/heads/NewAnticheat.zip), unzip and place it under the `azerothcore/modules` directory.
 
-### 2) Re-run cmake and launch a clean build of AzerothCore
+### 3) Re-run cmake and launch a clean build of AzerothCore
 
-### 3) Execute the included "conf/SQL/charactersdb_anticheat.sql" file on your characters database. This creates the necessary tables for this module.
+### 4) Execute the included "conf/SQL/charactersdb_anticheat.sql" file on your characters database. This creates the necessary tables for this module.
 
 **That's it.**
 
