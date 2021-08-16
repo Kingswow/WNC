@@ -306,6 +306,19 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         }
     }
 
+    if (sConfigMgr->GetOption<bool>("AntiCheats.Waterwalk.Enabled", true) && !UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING) &&
+        !mover->HasAuraType(SPELL_AURA_WATER_WALK) && !mover->HasAuraType(SPELL_AURA_GHOST))
+    {
+        LOG_INFO("anticheat", "PassiveAnticheat: Waterwalking mode (using MOVEMENTFLAG_WATERWALK flag without aura) by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d, Position: %s, MovementFlags: %d",
+            m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(), m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_WATERWALK, m_owner->GetName().c_str());
+        RecordAntiCheatLog(WATERWALK);
+        if (sConfigMgr->GetOption<bool>("AntiCheats.Waterwalk.Kick.Enabled", true))
+        {
+            return false;
+        }
+    }
+
     if (!sConfigMgr->GetOption<bool>("AntiCheats.SpeedHack.Enabled", true))
     {
         return true;
@@ -625,6 +638,9 @@ void AnticheatData::RecordAntiCheatLog(CheatTypes cheatType)
             break;
         case NO_FALLING:
             cheatColumn = "noFalling";
+            break;
+        case WATERWALK:
+            cheatColumn = "waterwalk";
             break;
     }
 

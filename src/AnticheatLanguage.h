@@ -19,7 +19,8 @@ enum AnticheatAcoreStrings
     LANG_GM_ANNOUNCE_JUMPER_FLYING          = 30093,  // Hitchhiker's Hack and others can set fly unrestricted flag
     LANG_GM_ANNOUNCE_WALLCLIMB              = 30094,  // WallClimb
     LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL     = 30095,  // Movement under Controll (not restricted)
-    LANG_GM_ANNOUNCE_NOFALLINGDMG           = 30096   // Falling without opcode of land/swim (not restricted)
+    LANG_GM_ANNOUNCE_NOFALLINGDMG           = 30096,  // Falling without opcode of land/swim (not restricted)
+    LANG_GM_ANNOUNCE_WATERWALK              = 30097   // Waterwalking without waterwalk aura
 };
 
 #endif
