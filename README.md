@@ -23,7 +23,7 @@ or you can manually [download the module](https://github.com/Kingswow/WNC/archiv
 
 ### 3) Re-run cmake and launch a clean build of AzerothCore
 
-### 4) Execute the included "conf/SQL/charactersdb_anticheat.sql" file on your characters database. This creates the necessary tables for this module.
+### 4) Execute the included "mod-anticheat/sql/auth/base/auth_anticheat_logs.sql and mod-anticheat/sql/world/base/world_acore_string.sql" file on your World And Auth databases. This creates the necessary tables for this module.
 
 **That's it.**
 
