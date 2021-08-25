@@ -374,7 +374,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
 
         if (sConfigMgr->GetOption<bool>("AntiCheats.IgnoreControlMovement.Enabled", true))
         {
-            if (mover->HasUnitState(UNIT_STATE_ROOT) && !UnderACKRootUpd())
+            if (mover->HasUnitState(UNIT_STATE_ROOT) && !mover->GetVehicle() && !UnderACKRootUpd())
             {
                 bool unrestricted = npos.GetPositionX() != x || npos.GetPositionY() != y;
                 if (unrestricted)
