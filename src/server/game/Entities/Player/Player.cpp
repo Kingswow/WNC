@@ -590,6 +590,8 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
 
+    UpdatePositionData();
+
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
     SetFullHealth();
@@ -875,7 +877,7 @@ void Player::HandleDrowning(uint32 time_diff)
     }
 
     // In dark water
-    if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
+    if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
@@ -898,7 +900,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
-            else if (!(m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER))
+            else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, getMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
         }
     }
@@ -908,7 +910,7 @@ void Player::HandleDrowning(uint32 time_diff)
         m_MirrorTimer[FATIGUE_TIMER] += 10 * time_diff;
         if (m_MirrorTimer[FATIGUE_TIMER] >= DarkWaterTime || !IsAlive())
             StopMirrorTimer(FATIGUE_TIMER);
-        else if (m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER)
+        else if (m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
@@ -2063,31 +2065,6 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
         }
     }
     return nullptr;
-}
-
-bool Player::IsInWater(bool allowAbove) const
-{
-    if (m_isInWater || !allowAbove)
-        return m_isInWater;
-
-    float distsq = GetExactDistSq(&m_last_environment_position);
-    if (distsq < 3.0f * 3.0f)
-        return m_last_islittleabovewater_status;
-    else
-    {
-        LiquidData liqData;
-        liqData.level = INVALID_HEIGHT;
-        const_cast<Position*>(&m_last_environment_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        bool inWater = GetBaseMap()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ(), &liqData);
-        *(const_cast<bool*>(&m_last_islittleabovewater_status)) = inWater || (liqData.level > INVALID_HEIGHT && liqData.level > liqData.depth_level && liqData.level <= GetPositionZ() + 3.0f && liqData.level > GetPositionZ() - 1.0f);
-        return m_last_islittleabovewater_status;
-    }
-}
-
-bool Player::IsUnderWater() const
-{
-    return IsInWater() &&
-           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -4354,7 +4331,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // trigger update zone for alive state zone updates
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);
     sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
 
@@ -4506,6 +4483,8 @@ Corpse* Player::CreateCorpse()
 
     // register for player, but not show
     GetMap()->AddCorpse(corpse);
+
+    UpdatePositionData();
 
     // we do not need to save corpses for BG/arenas
     if (!GetMap()->IsBattlegroundOrArena())
@@ -5562,7 +5541,7 @@ void Player::CheckAreaExploreAndOutdoor()
         return;
 
     bool isOutdoor = IsOutdoors();
-    uint32 areaId = GetBaseMap()->GetAreaId(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
+    uint32 areaId = GetAreaId();
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
     if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
@@ -6158,7 +6137,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         if (!sMapStore.LookupEntry(map))
             return 0;
 
-        zone = sMapMgr->GetZoneId(map, posx, posy, posz);
+        zone = sMapMgr->GetZoneId(PHASEMASK_NORMAL, map, posx, posy, posz);
 
         if (zone > 0)
         {
@@ -6181,36 +6160,6 @@ uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
         return playerData->level;
 
     return 0;
-}
-
-uint32 Player::GetZoneId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_zone_id)) = WorldObject::GetZoneId();
-
-    return m_last_zone_id;
-}
-
-uint32 Player::GetAreaId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_area_id)) = WorldObject::GetAreaId();
-
-    return m_last_area_id;
-}
-
-void Player::GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc) const
-{
-    if (forceRecalc)
-    {
-        WorldObject::GetZoneAndAreaId(zoneid, areaid);
-        *(const_cast<uint32*>(&m_last_zone_id)) = zoneid;
-        *(const_cast<uint32*>(&m_last_area_id)) = areaid;
-        return;
-    }
-
-    zoneid = m_last_zone_id;
-    areaid = m_last_area_id;
 }
 
 //If players are too far away from the duel flag... they lose the duel
@@ -10848,7 +10797,7 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     // update zone
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
@@ -13764,7 +13713,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -13902,7 +13851,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -14169,10 +14118,16 @@ void Player::ActivateSpec(uint8 spec)
 
         // pussywizard: was => isn't
         if (itr->second->IsInSpec(oldSpec) && !itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, false);
+            // We want to remove all auras of the unlearned spell
+            _removeTalentAurasAndSpells(itr->first);
+        }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, true);
+        }
     }
 
     // xinef: apply glyphs from second spec
