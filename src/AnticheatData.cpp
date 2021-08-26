@@ -171,10 +171,9 @@ bool AnticheatData::CheckOnFlyHack()
     float pz = npos.GetPositionZ();
     if (!mover->IsInWater() && mover->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
-        LiquidData liquid_status;
-        mover->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, mover->GetCollisionHeight());
+        LiquidData const& liquidData = mover->GetMap()->GetLiquidData(mover->GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, mover->GetCollisionHeight(), MAP_ALL_LIQUIDS);
 
-        float waterlevel = liquid_status.level; // water walking
+        float waterlevel = liquidData.Level; // water walking
         bool  hovergaura = mover->HasAuraType(SPELL_AURA_WATER_WALK) || mover->HasAuraType(SPELL_AURA_HOVER);
         if (waterlevel > INVALID_HEIGHT && (pz - waterlevel) <= (hovergaura ? mover->GetCollisionHeight() + 1.5f : mover->GetCollisionHeight() + 1.5f))
         {
@@ -200,10 +199,9 @@ bool AnticheatData::CheckOnFlyHack()
             float diff = pz - z;
             if (diff > 6.8f) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
             {
-                LiquidData liquid_status;
-                mover->GetMap()->getLiquidStatus(npos.GetPositionX(), npos.GetPositionY(), pz, MAP_ALL_LIQUIDS, &liquid_status, mover->GetCollisionHeight());
+                LiquidData const& liquidData = mover->GetMap()->GetLiquidData(mover->GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, mover->GetCollisionHeight(), MAP_ALL_LIQUIDS);
 
-                float waterlevel = liquid_status.level; // water walking
+                float waterlevel = liquidData.Level; // water walking
                 if (waterlevel > INVALID_HEIGHT && waterlevel + mover->GetCollisionHeight() > pz)
                 {
                     return true;
