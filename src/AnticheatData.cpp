@@ -133,7 +133,7 @@ bool AnticheatData::CheckOnFlyHack()
         return true;
     }
 
-    if (mover->IsFlying() && !mover->CanFly()) // kick flyhacks
+    if (mover->IsFlying() && !mover->CanFly() && !mover->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY)) // kick flyhacks
     {
         LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s) Map: %d, Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
@@ -289,7 +289,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         }
     }
 
-    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Enabled", true) && !IsCanFlybyServer() && !UnderACKmount() &&
+    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeFlyingmode.Enabled", true) && !IsCanFlybyServer() && !UnderACKmount() && !mover->HasAuraType(SPELL_AURA_FLY) &&
         movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !mover->IsInWater())
     {
         LOG_INFO("anticheat", "PassiveAnticheat: Fake flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d, Position: %s, MovementFlags: %d",
@@ -400,7 +400,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         // calculate distance - don't use func, because x,z can be offset transport coords
         distance = sqrt((npos.GetPositionY() - y) * (npos.GetPositionY() - y) + (npos.GetPositionX() - x) * (npos.GetPositionX() - x));
 
-        if (!jump && !mover->CanFly() && !mover->isSwimming() && !transportflag && distance > 0.f)
+        if (!jump && !mover->CanFly() && !mover->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) && !mover->isSwimming() && !transportflag && distance > 0.f)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - z);
             float tanangle = distance / diffz;
@@ -434,7 +434,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
             runspeed = mover->GetSpeed(MOVE_SWIM);
         }
 
-        if (mover->IsFlying() || mover->CanFly())
+        if (mover->IsFlying() || mover->CanFly() || mover->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
         {
             flyspeed = mover->GetSpeed(MOVE_FLIGHT);
         }
@@ -581,7 +581,7 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
                 break;
         }
 
-        if (IsCanFlybyServer())
+        if (IsCanFlybyServer() || mover->HasAuraType(SPELL_AURA_FLY))
             checkNorm = true;
 
         if (!checkNorm)
@@ -656,7 +656,8 @@ void AnticheatData::RecordAntiCheatLog(CheatTypes cheatType)
 
 void AnticheatData::HandleNoFallingDamage(uint16 opcode)
 {
-    if (!IsCanFlybyServer())
+    Unit* mover = m_owner->m_mover;
+    if (!IsCanFlybyServer() && !mover->HasAuraType(SPELL_AURA_FLY))
     {
         bool checkNorm = false;
         switch (opcode)
