@@ -133,6 +133,11 @@ bool AnticheatData::CheckOnFlyHack()
         return true;
     }
 
+    if (mover->GetVehicle())
+    {
+        return true;
+    }
+
     if (mover->IsFlying() && !mover->CanFly() && !mover->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY)) // kick flyhacks
     {
         LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s) Map: %d, Position: %s, MovementFlags: %d",
@@ -267,6 +272,11 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
     }
 
     if (sAnticheatMgr->isMapDisabledForAC(mover->GetMapId()) || sAnticheatMgr->isAreaDisabledForAC(mover->GetAreaId()))
+    {
+        return true;
+    }
+
+    if (mover->GetVehicle())
     {
         return true;
     }
@@ -526,6 +536,11 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
         return true;
     }
 
+    if (mover->GetVehicle())
+    {
+        return true;
+    }
+
     if (mover->IsFalling())
     {
         LOG_INFO("anticheat", "PassiveAnticheat: Double jump by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d, Position: %s, MovementFlags: %d",
@@ -569,6 +584,11 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
         if (mover->movespline->Initialized() && !mover->movespline->Finalized())
         {
             SetSuccessfullyLanded();
+            return true;
+        }
+
+        if (mover->GetVehicle())
+        {
             return true;
         }
 
