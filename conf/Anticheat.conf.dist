@@ -82,6 +82,13 @@ AntiCheats.FlyHack.Kick.Enabled = 1
 
 AntiCheats.SpeedHack.Kick.Enabled = 1
 
+#    AntiCheats.DoubleJump.Kick.Enabled
+#        Description: Enable AntiCheats.DoubleJump Kick when detected
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.DoubleJump.Kick.Enabled = 1
+
 #    AntiCheats.FakeJumper.Kick.Enabled
 #        Description: Enable AntiCheats.FakeJumper Kick when detected
 #        Default:     1 - (Enabled)

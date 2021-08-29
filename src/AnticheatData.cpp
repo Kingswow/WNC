@@ -573,7 +573,7 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
 
         RecordAntiCheatLog(DOUBLE_JUMP);
 
-        if (sConfigMgr->GetOption<bool>("AntiCheats.DoubleJump.Enabled", true))
+        if (sConfigMgr->GetOption<bool>("AntiCheats.DoubleJump.Kick.Enabled", true))
         {
             return false;
         }
