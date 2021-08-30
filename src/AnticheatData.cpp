@@ -143,8 +143,8 @@ bool AnticheatData::CheckOnFlyHack()
         LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s) Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         LOG_INFO("anticheat", "Player::========================================================");
         LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
@@ -190,8 +190,8 @@ bool AnticheatData::CheckOnFlyHack()
         LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         LOG_INFO("anticheat", "Player::========================================================");
         LOG_INFO("anticheat", "Player has a MOVEMENTFLAG_SWIMMING, but not in water");
@@ -227,8 +227,8 @@ bool AnticheatData::CheckOnFlyHack()
                         LOG_INFO("anticheat", "PassiveAnticheat: FlyHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
                             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
                             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-                            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+                            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+                            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
                             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
                         LOG_INFO("anticheat", "Player::========================================================");
                         LOG_INFO("anticheat", "playerZ = %f", pz);
@@ -295,8 +295,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
             LOG_INFO("anticheat", "PassiveAnticheat: Fake jumper by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
                 m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
                 mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-                sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+                sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+                sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
                 m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, m_owner->GetName().c_str());
             RecordAntiCheatLog(FAKE_JUMP);
@@ -313,8 +313,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         LOG_INFO("anticheat", "PassiveAnticheat: Fake flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, m_owner->GetName().c_str());
         RecordAntiCheatLog(FAKE_FLY);
@@ -329,8 +329,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
     {
         LOG_INFO("anticheat", "PassiveAnticheat: Waterwalking mode (using MOVEMENTFLAG_WATERWALK flag without aura) by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(), mover->GetName().c_str(),
-            mover->GetGUID().ToString().c_str(), m_owner->GetMapId(), sMapStore.LookupEntry(m_owner->GetMapId())->name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0], sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            mover->GetGUID().ToString().c_str(), m_owner->GetMapId(), sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         sWorld->SendGMText(LANG_GM_ANNOUNCE_WATERWALK, m_owner->GetName().c_str());
         RecordAntiCheatLog(WATERWALK);
@@ -403,8 +403,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                     LOG_INFO("anticheat", "CheckMovementInfo :  Ignore control Hack detected for Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
                         m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
                         mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), mover->GetMapId(),
-                        sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-                        sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+                        sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+                        sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
                         m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
                     sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str());
                     RecordAntiCheatLog(IGNORE_CONTROL);
@@ -435,8 +435,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
                 LOG_INFO("anticheat", "PassiveAnticheat: Climb Hack detected for Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
                     m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
                     mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-                    sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-                    sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+                    sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+                    sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
                     m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), m_owner->GetMapId(), x, y, z);
@@ -494,8 +494,8 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         LOG_INFO("anticheat", "PassiveAnticheat: SpeedHack Detected for Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
         LOG_INFO("anticheat", "========================================================");
         LOG_INFO("anticheat", "oldX = %f", x);
@@ -565,8 +565,8 @@ bool AnticheatData::HandleDoubleJump(Unit* mover)
         LOG_INFO("anticheat", "PassiveAnticheat: Double jump by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
             m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
             mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(),
-            sMapStore.LookupEntry(m_owner->GetMapId())->name[0], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0],
-            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+            sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()],
+            sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
             m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, m_owner->GetName().c_str());
@@ -629,8 +629,8 @@ bool AnticheatData::NoFallingDamage(uint16 opcode)
         {
             LOG_INFO("anticheat", "PassiveAnticheat: NoFallingDamage by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d (%s, Zone: %s, Area: %s), Position: %s, MovementFlags: %d",
                 m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str(), m_owner->GetGUID().ToString().c_str(),
-                mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(), sMapStore.LookupEntry(m_owner->GetMapId())->name[0],
-                sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[0], sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[0],
+                mover->GetName().c_str(), mover->GetGUID().ToString().c_str(), m_owner->GetMapId(), sMapStore.LookupEntry(m_owner->GetMapId())->name[sWorld->GetDefaultDbcLocale()],
+                sAreaTableStore.LookupEntry(m_owner->GetAreaId())->area_name[sWorld->GetDefaultDbcLocale()], sAreaTableStore.LookupEntry(m_owner->GetZoneId())->area_name[sWorld->GetDefaultDbcLocale()],
                 m_owner->GetPosition().ToString().c_str(), m_owner->GetUnitMovementFlags());
 
             sWorld->SendGMText(LANG_GM_ANNOUNCE_NOFALLINGDMG, m_owner->GetSession()->GetAccountId(), m_owner->GetName().c_str());
