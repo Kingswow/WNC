@@ -8,7 +8,7 @@ This is a port of the PassiveAnticheat Script from lordpsyan's repo to [AzerothC
 
 ### 1) First Download Master Branch.
 
-`git clone https://github.com/Kingswow/WNC.git master`
+`git clone https://github.com/Kingswow/WNC.git AC3.3.5`
 
 
 ### 2) Simply place the module under the `modules` folder of your AzerothCore source folder.
