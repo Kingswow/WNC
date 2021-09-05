@@ -57,8 +57,8 @@ class AnticheatMgr
         bool isMapDisabledForAC(uint32 mapid) const { return excludeACMapsId.count(mapid); }
         bool isAreaDisabledForAC(uint32 areaid) const { return excludeACAreasId.count(areaid); }
 
-        bool HandleDoubleJump(Player* player, Unit* mover);
-        bool CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
+        bool HandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo);
+        bool CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode);
 
         void ResetFallingData(Player* player);
         bool NoFallingDamage(Player* player, uint16 opcode);

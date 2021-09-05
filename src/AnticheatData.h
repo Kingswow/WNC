@@ -43,8 +43,8 @@ class AnticheatData
 
         // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
         void UpdateMovementInfo(MovementInfo const& movementInfo);
-        bool CheckMovementInfo(MovementInfo const& movementInfo, Unit* mover, bool jump);
-        bool CheckMovement(MovementInfo const& movementInfo, Unit* mover, bool jump);
+        bool CheckMovementInfo(MovementInfo const& movementInfo, Unit* mover, uint16 opcode);
+        bool CheckMovement(MovementInfo const& movementInfo, Unit* mover, uint16 opcode);
         bool CheckOnFlyHack(); // AFH
 
         void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
@@ -52,7 +52,7 @@ class AnticheatData
         uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
         uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
 
-        bool HandleDoubleJump(Unit* mover);
+        bool HandleDoubleJump(Unit* mover, MovementInfo const& movementInfo);
 
         void ResetFallingData();
 

@@ -53,14 +53,14 @@ public:
         sAnticheatMgr->UpdateMovementInfo(player, movementInfo);
     }
 
-    bool AnticheatHandleDoubleJump(Player* player, Unit* mover) override
+    bool AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo) override
     {
-        return sAnticheatMgr->HandleDoubleJump(player, mover);
+        return sAnticheatMgr->HandleDoubleJump(player, mover, movementInfo);
     }
 
-    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump) override
+    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode) override
     {
-        return sAnticheatMgr->CheckMovementInfo(player, movementInfo, mover, jump);
+        return sAnticheatMgr->CheckMovementInfo(player, movementInfo, mover, opcode);
     }
 
     void AnticheatResetFallingData(Player* player) override

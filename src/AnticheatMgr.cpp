@@ -158,23 +158,23 @@ void AnticheatMgr::UpdateMovementInfo(Player* player, MovementInfo const& moveme
     }
 }
 
-bool AnticheatMgr::HandleDoubleJump(Player* player, Unit* mover)
+bool AnticheatMgr::HandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
     {
-        return itr->second.HandleDoubleJump(mover);
+        return itr->second.HandleDoubleJump(mover, movementInfo);
     }
 
     return true;
 }
 
-bool AnticheatMgr::CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+bool AnticheatMgr::CheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode)
 {
     auto itr = m_Players.find(player->GetGUID());
     if (itr != m_Players.end())
     {
-        return itr->second.CheckMovementInfo(movementInfo, mover, jump);
+        return itr->second.CheckMovementInfo(movementInfo, mover, opcode);
     }
 
     return true;
