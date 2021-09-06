@@ -63,22 +63,22 @@ public:
         return sAnticheatMgr->CheckMovementInfo(player, movementInfo, mover, opcode);
     }
 
-    void AnticheatResetFallingData(Player* player) override
+    void AnticheatResetFallingData(Player* player)
     {
         sAnticheatMgr->ResetFallingData(player);
     }
 
-    bool AnticheatNoFallingDamage(Player* player, uint16 opcode) override
+    bool AnticheatNoFallingDamage(Player* player, uint16 opcode)
     {
         return sAnticheatMgr->NoFallingDamage(player, opcode);
     }
 
-    void AnticheatHandleNoFallingDamage(Player* player, uint16 opcode) override
+    void AnticheatHandleNoFallingDamage(Player* player, uint16 opcode)
     {
         sAnticheatMgr->HandleNoFallingDamage(player, opcode);
     }
 
-    void AnticheatSetSuccessfullyLanded(Player* player) override
+    void AnticheatSetSuccessfullyLanded(Player* player)
     {
         sAnticheatMgr->SetSuccessfullyLanded(player);
     }
