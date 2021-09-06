@@ -4,23 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Config.h"
 #include "CreatureAI.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "ScriptSystem.h"
+#include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "SmartAI.h"
 #include "WorldPacket.h"
 
 #ifdef ELUNA
@@ -32,14 +32,13 @@ struct TSpellSummary
 {
     uint8 Targets; // set of enum SelectTarget
     uint8 Effects; // set of enum SelectEffect
-}*SpellSummary;
+} * SpellSummary;
 
 #include "ScriptMgrMacros.h"
 
-ScriptMgr::ScriptMgr()
-    : _scriptCount(0), _scheduledScripts(0), _script_loader_callback(nullptr) { }
+ScriptMgr::ScriptMgr() : _scriptCount(0), _scheduledScripts(0), _script_loader_callback(nullptr) {}
 
-ScriptMgr::~ScriptMgr() { }
+ScriptMgr::~ScriptMgr() {}
 
 ScriptMgr* ScriptMgr::instance()
 {
@@ -54,18 +53,16 @@ void ScriptMgr::Initialize()
 
     AddSC_SmartScripts();
 
-    ASSERT(_script_loader_callback,
-        "Script loader callback wasn't registered!");
+    ASSERT(_script_loader_callback, "Script loader callback wasn't registered!");
 
     _script_loader_callback();
 }
 
 void ScriptMgr::Unload()
 {
-#define SCR_CLEAR(T) \
-        for (SCR_REG_ITR(T) itr = SCR_REG_LST(T).begin(); itr != SCR_REG_LST(T).end(); ++itr) \
-            delete itr->second; \
-        SCR_REG_LST(T).clear();
+#define SCR_CLEAR(T)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    for (SCR_REG_ITR(T) itr = SCR_REG_LST(T).begin(); itr != SCR_REG_LST(T).end(); ++itr) delete itr->second;                                                                                                                                                                                                                                                                                                                                                                                                      \
+    SCR_REG_LST(T).clear();
 
     // Clear scripts for every script type.
     SCR_CLEAR(SpellScriptLoader);
@@ -147,41 +144,13 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
     {
         if (uint32 sid = sObjectMgr->GetScriptId(scriptName.c_str()))
         {
-            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
-                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
-                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
-                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
-                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
-                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
-                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
-                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
-                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
-                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
-                !ScriptRegistry<BGScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AchievementScript>::GetScriptById(sid) &&
-                !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) &&
-                !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
-                !ScriptRegistry<MiscScript>::GetScriptById(sid) &&
-                !ScriptRegistry<PetScript>::GetScriptById(sid) &&
-                !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
-                !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                {
-                    LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
-                }
+            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) && !ScriptRegistry<ServerScript>::GetScriptById(sid) && !ScriptRegistry<WorldScript>::GetScriptById(sid) && !ScriptRegistry<FormulaScript>::GetScriptById(sid) && !ScriptRegistry<WorldMapScript>::GetScriptById(sid) && !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) && !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) && !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CreatureScript>::GetScriptById(sid) && !ScriptRegistry<GameObjectScript>::GetScriptById(sid) && !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) && !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) && !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) && !ScriptRegistry<CommandScript>::GetScriptById(sid) && !ScriptRegistry<WeatherScript>::GetScriptById(sid) && !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ConditionScript>::GetScriptById(sid) && !ScriptRegistry<VehicleScript>::GetScriptById(sid) && !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) && !ScriptRegistry<TransportScript>::GetScriptById(sid) && !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) && !ScriptRegistry<PlayerScript>::GetScriptById(sid) && !ScriptRegistry<GuildScript>::GetScriptById(sid) && !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementScript>::GetScriptById(sid) && !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) && !ScriptRegistry<SpellSC>::GetScriptById(sid) && !ScriptRegistry<MiscScript>::GetScriptById(sid) && !ScriptRegistry<PetScript>::GetScriptById(sid) && !ScriptRegistry<CommandSC>::GetScriptById(sid) && !ScriptRegistry<ArenaScript>::GetScriptById(sid) && !ScriptRegistry<GroupScript>::GetScriptById(sid))
+            {
+                LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
+            }
         }
     }
 }
@@ -211,59 +180,35 @@ void ScriptMgr::FillSpellSummary()
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_SELF - 1);
 
             // Spell targets a single enemy.
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_TARGET_ENEMY)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_TARGET_ENEMY)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_SINGLE_ENEMY - 1);
 
             // Spell targets AoE at enemy.
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_DEST_AREA_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_DYNOBJ_ENEMY)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_DEST_AREA_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_DYNOBJ_ENEMY)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_AOE_ENEMY - 1);
 
             // Spell targets an enemy.
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_TARGET_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_DEST_AREA_ENEMY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_DYNOBJ_ENEMY)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_TARGET_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_DEST_AREA_ENEMY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_DEST_DYNOBJ_ENEMY)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_ANY_ENEMY - 1);
 
             // Spell targets a single friend (or self).
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_PARTY)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_PARTY)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_SINGLE_FRIEND - 1);
 
             // Spell targets AoE friends.
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_LASTTARGET_AREA_PARTY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_LASTTARGET_AREA_PARTY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_AOE_FRIEND - 1);
 
             // Spell targets any friend (or self).
-            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_PARTY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_LASTTARGET_AREA_PARTY ||
-                    pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER)
+            if (pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_TARGET_PARTY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_UNIT_LASTTARGET_AREA_PARTY || pTempSpell->Effects[j].TargetA.GetTarget() == TARGET_SRC_CASTER)
                 SpellSummary[i].Targets |= 1 << (SELECT_TARGET_ANY_FRIEND - 1);
 
             // Make sure that this spell includes a damage effect.
-            if (pTempSpell->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE ||
-                    pTempSpell->Effects[j].Effect == SPELL_EFFECT_INSTAKILL ||
-                    pTempSpell->Effects[j].Effect == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE ||
-                    pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEALTH_LEECH)
+            if (pTempSpell->Effects[j].Effect == SPELL_EFFECT_SCHOOL_DAMAGE || pTempSpell->Effects[j].Effect == SPELL_EFFECT_INSTAKILL || pTempSpell->Effects[j].Effect == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE || pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEALTH_LEECH)
                 SpellSummary[i].Effects |= 1 << (SELECT_EFFECT_DAMAGE - 1);
 
             // Make sure that this spell includes a healing effect (or an apply aura with a periodic heal).
-            if (pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL ||
-                    pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-                    pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL_MECHANICAL ||
-                    (pTempSpell->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA  && pTempSpell->Effects[j].ApplyAuraName == 8))
+            if (pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL || pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL_MAX_HEALTH || pTempSpell->Effects[j].Effect == SPELL_EFFECT_HEAL_MECHANICAL || (pTempSpell->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA && pTempSpell->Effects[j].ApplyAuraName == 8))
                 SpellSummary[i].Effects |= 1 << (SELECT_EFFECT_HEALING - 1);
 
             // Make sure that this spell applies an aura.
@@ -315,7 +260,7 @@ void ScriptMgr::CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& script
     }
 }
 
-void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> >& scriptVector)
+void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator>>& scriptVector)
 {
     SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
     scriptVector.reserve(std::distance(bounds.first, bounds.second));
@@ -480,20 +425,20 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
     FOREACH_SCRIPT(FormulaScript)->OnGroupRateCalculation(rate, count, isRaid);
 }
 
-#define SCR_MAP_BGN(M, V, I, E, C, T) \
-    if (V->GetEntry() && V->GetEntry()->T()) \
-    { \
-        FOR_SCRIPTS(M, I, E) \
-        { \
-            MapEntry const* C = I->second->GetEntry(); \
-            if (!C) \
-                continue; \
-            if (C->MapID == V->GetId()) \
+#define SCR_MAP_BGN(M, V, I, E, C, T)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    if (V->GetEntry() && V->GetEntry()->T())                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+    {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+        FOR_SCRIPTS(M, I, E)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+            MapEntry const* C = I->second->GetEntry();                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+            if (!C)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
+                continue;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+            if (C->MapID == V->GetId())                                                                                                                                                                                                                                                                                                                                                                                                                                                                            \
             {
-#define SCR_MAP_END \
-                return; \
-            } \
-        } \
+#define SCR_MAP_END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
+    return;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
     }
 
 void ScriptMgr::OnCreateMap(Map* map)
@@ -509,11 +454,11 @@ void ScriptMgr::OnCreateMap(Map* map)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnCreate((InstanceMap*)map);
+    itr->second->OnCreate((InstanceMap*) map);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnCreate((BattlegroundMap*)map);
+    itr->second->OnCreate((BattlegroundMap*) map);
     SCR_MAP_END;
 }
 
@@ -530,11 +475,11 @@ void ScriptMgr::OnDestroyMap(Map* map)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnDestroy((InstanceMap*)map);
+    itr->second->OnDestroy((InstanceMap*) map);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnDestroy((BattlegroundMap*)map);
+    itr->second->OnDestroy((BattlegroundMap*) map);
     SCR_MAP_END;
 }
 
@@ -548,11 +493,11 @@ void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnLoadGridMap((InstanceMap*)map, gmap, gx, gy);
+    itr->second->OnLoadGridMap((InstanceMap*) map, gmap, gx, gy);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnLoadGridMap((BattlegroundMap*)map, gmap, gx, gy);
+    itr->second->OnLoadGridMap((BattlegroundMap*) map, gmap, gx, gy);
     SCR_MAP_END;
 }
 
@@ -566,11 +511,11 @@ void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnUnloadGridMap((InstanceMap*)map, gmap, gx, gy);
+    itr->second->OnUnloadGridMap((InstanceMap*) map, gmap, gx, gy);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnUnloadGridMap((BattlegroundMap*)map, gmap, gx, gy);
+    itr->second->OnUnloadGridMap((BattlegroundMap*) map, gmap, gx, gy);
     SCR_MAP_END;
 }
 
@@ -593,11 +538,11 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnPlayerEnter((InstanceMap*)map, player);
+    itr->second->OnPlayerEnter((InstanceMap*) map, player);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnPlayerEnter((BattlegroundMap*)map, player);
+    itr->second->OnPlayerEnter((BattlegroundMap*) map, player);
     SCR_MAP_END;
 }
 
@@ -617,11 +562,11 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnPlayerLeave((InstanceMap*)map, player);
+    itr->second->OnPlayerLeave((InstanceMap*) map, player);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnPlayerLeave((BattlegroundMap*)map, player);
+    itr->second->OnPlayerLeave((BattlegroundMap*) map, player);
     SCR_MAP_END;
 }
 
@@ -638,11 +583,11 @@ void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
     SCR_MAP_END;
 
     SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-    itr->second->OnUpdate((InstanceMap*)map, diff);
+    itr->second->OnUpdate((InstanceMap*) map, diff);
     SCR_MAP_END;
 
     SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-    itr->second->OnUpdate((BattlegroundMap*)map, diff);
+    itr->second->OnUpdate((BattlegroundMap*) map, diff);
     SCR_MAP_END;
 }
 
@@ -1056,10 +1001,7 @@ std::vector<ChatCommand> ScriptMgr::GetChatCommands()
     }
 
     // Sort commands in alphabetical order
-    std::sort(table.begin(), table.end(), [](const ChatCommand & a, const ChatCommand & b)
-    {
-        return strcmp(a.Name, b.Name) < 0;
-    });
+    std::sort(table.begin(), table.end(), [](const ChatCommand& a, const ChatCommand& b) { return strcmp(a.Name, b.Name) < 0; });
 
     return table;
 }
@@ -1749,8 +1691,8 @@ bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
     bool ret = false; // return false by default if not scripts
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret)
-        if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
-            ret = true; // we change ret value only when a script returns true
+    if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+        ret = true; // we change ret value only when a script returns true
 
     return ret;
 }
@@ -1876,8 +1818,7 @@ void ScriptMgr::OnGuildMemberDepositMoney(Guild* guild, Player* player, uint32& 
     FOREACH_SCRIPT(GuildScript)->OnMemberDepositMoney(guild, player, amount);
 }
 
-void ScriptMgr::OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
-                                bool isDestBank, uint8 destContainer, uint8 destSlotId)
+void ScriptMgr::OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId, bool isDestBank, uint8 destContainer, uint8 destSlotId)
 {
 #ifdef ELUNA
     sEluna->OnItemMove(guild, player, pItem, isSrcBank, srcContainer, srcSlotId, isDestBank, destContainer, destSlotId);
@@ -1981,18 +1922,19 @@ bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreI
     bool ret = true; // return true by default
 
     FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
-        if (!itr->second->OnItemRoll(player, LootStoreItem, chance, loot, store))
-            ret = false; // we change ret value only when a script returns false
+    if (!itr->second->OnItemRoll(player, LootStoreItem, chance, loot, store))
+        ret = false; // we change ret value only when a script returns false
 
     return ret;
 }
 
-bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store) {
+bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store)
+{
     bool ret = true; // return true by default
 
     FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
-        if (!itr->second->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
-            ret = false; // we change ret value only when a script returns false
+    if (!itr->second->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+        ret = false; // we change ret value only when a script returns false
 
     return ret;
 }
@@ -2155,8 +2097,7 @@ bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, c
     return ret;
 }
 
-bool ScriptMgr::CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
-        BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
+bool ScriptMgr::CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
 {
     bool ret = true;
 
@@ -2232,10 +2173,10 @@ void ScriptMgr::OnBeforeUpdatingPersonalRating(int32& mod, uint32 type)
 
 bool ScriptMgr::OnBeforePlayerQuestComplete(Player* player, uint32 quest_id)
 {
-    bool ret=true;
+    bool ret = true;
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
     if (!itr->second->OnBeforeQuestComplete(player, quest_id))
-        ret=false; // we change ret value only when scripts return false
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2250,8 +2191,8 @@ bool ScriptMgr::CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid,
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanJoinInArenaQueue(player, BattlemasterGuid, arenaslot, BGTypeID, joinAsGroup, IsRated, err))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanJoinInArenaQueue(player, BattlemasterGuid, arenaslot, BGTypeID, joinAsGroup, IsRated, err))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2261,8 +2202,8 @@ bool ScriptMgr::CanBattleFieldPort(Player* player, uint8 arenaType, Battleground
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanBattleFieldPort(player, arenaType, BGTypeID, action))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanBattleFieldPort(player, arenaType, BGTypeID, action))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2272,8 +2213,8 @@ bool ScriptMgr::CanGroupInvite(Player* player, std::string& membername)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanGroupInvite(player, membername))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanGroupInvite(player, membername))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2283,8 +2224,8 @@ bool ScriptMgr::CanGroupAccept(Player* player, Group* group)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanGroupAccept(player, group))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanGroupAccept(player, group))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2294,8 +2235,8 @@ bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSellItem(player, item, creature))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSellItem(player, item, creature))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2305,8 +2246,8 @@ bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid 
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2331,8 +2272,8 @@ bool ScriptMgr::CanGiveMailRewardAtGiveLevel(Player* player, uint8 level)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanGiveMailRewardAtGiveLevel(player, level))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanGiveMailRewardAtGiveLevel(player, level))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2347,8 +2288,8 @@ bool ScriptMgr::CanRepopAtGraveyard(Player* player)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanRepopAtGraveyard(player))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanRepopAtGraveyard(player))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2363,8 +2304,8 @@ bool ScriptMgr::CanAreaExploreAndOutdoor(Player* player)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanAreaExploreAndOutdoor(player))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanAreaExploreAndOutdoor(player))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2394,8 +2335,8 @@ bool ScriptMgr::CanArmorDamageModifier(Player* player)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanArmorDamageModifier(player))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanArmorDamageModifier(player))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2410,8 +2351,8 @@ bool ScriptMgr::CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item,
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanApplyWeaponDependentAuraDamageMod(player, item, attackType, aura, apply))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanApplyWeaponDependentAuraDamageMod(player, item, attackType, aura, apply))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2421,8 +2362,8 @@ bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, I
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanApplyEquipSpell(player, spellInfo, item, apply, form_change))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanApplyEquipSpell(player, spellInfo, item, apply, form_change))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2432,8 +2373,8 @@ bool ScriptMgr::CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanApplyEquipSpellsItemSet(player, eff))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanApplyEquipSpellsItemSet(player, eff))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2443,8 +2384,8 @@ bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttac
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanCastItemCombatSpell(player, target, attType, procVictim, procEx, item, proto))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanCastItemCombatSpell(player, target, attType, procVictim, procEx, item, proto))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2454,8 +2395,8 @@ bool ScriptMgr::CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanCastItemUseSpell(player, item, targets, cast_count, glyphIndex))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanCastItemUseSpell(player, item, targets, cast_count, glyphIndex))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2470,8 +2411,8 @@ bool ScriptMgr::CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pIt
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanEquipItem(player, slot, dest, pItem, swap, not_loading))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanEquipItem(player, slot, dest, pItem, swap, not_loading))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2481,8 +2422,8 @@ bool ScriptMgr::CanUnequipItem(Player* player, uint16 pos, bool swap)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanUnequipItem(player, pos, swap))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanUnequipItem(player, pos, swap))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2492,8 +2433,8 @@ bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryR
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanUseItem(player, proto, result))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanUseItem(player, proto, result))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2503,8 +2444,8 @@ bool ScriptMgr::CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSaveEquipNewItem(player, item, pos, update))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSaveEquipNewItem(player, item, pos, update))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2514,8 +2455,8 @@ bool ScriptMgr::CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot 
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanApplyEnchantment(player, item, slot, apply, apply_dur, ignore_condition))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanApplyEnchantment(player, item, slot, apply, apply_dur, ignore_condition))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2530,8 +2471,8 @@ bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinf
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2541,8 +2482,8 @@ bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CheckItemInSlotAtLoadInventory(player, item, slot, err, dest))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CheckItemInSlotAtLoadInventory(player, item, slot, err, dest))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2552,8 +2493,8 @@ bool ScriptMgr::NotAvoidSatisfy(Player* player, DungeonProgressionRequirements c
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->NotAvoidSatisfy(player, ar, target_map, report))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->NotAvoidSatisfy(player, ar, target_map, report))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2563,8 +2504,8 @@ bool ScriptMgr::NotVisibleGloballyFor(Player* player, Player const* u)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->NotVisibleGloballyFor(player, u))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->NotVisibleGloballyFor(player, u))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2599,8 +2540,8 @@ bool ScriptMgr::NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamIn
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->NotSetArenaTeamInfoField(player, slot, type, value))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->NotSetArenaTeamInfoField(player, slot, type, value))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2610,8 +2551,8 @@ bool ScriptMgr::CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dung
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanJoinLfg(player, roles, dungeons, comment))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanJoinLfg(player, roles, dungeons, comment))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2621,8 +2562,8 @@ bool ScriptMgr::CanEnterMap(Player* player, MapEntry const* entry, InstanceTempl
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2632,8 +2573,8 @@ bool ScriptMgr::CanInitTrade(Player* player, Player* target)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanInitTrade(player, target))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanInitTrade(player, target))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2678,24 +2619,24 @@ void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& 
     FOREACH_SCRIPT(PlayerScript)->AnticheatUpdateMovementInfo(player, movementInfo);
 }
 
-bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->AnticheatHandleDoubleJump(player, mover))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->AnticheatHandleDoubleJump(player, mover, movementInfo))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
 
-bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, jump))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, opcode))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -2710,8 +2651,8 @@ bool ScriptMgr::AnticheatNoFallingDamage(Player* player, uint16 opcode)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->AnticheatNoFallingDamage(player, opcode))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->AnticheatNoFallingDamage(player, opcode))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -2731,8 +2672,8 @@ bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, 
     bool ret = true;
 
     FOR_SCRIPTS_RET(GuildScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanGuildSendBankList(guild, session, tabId, sendAllSlots))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->CanGuildSendBankList(guild, session, tabId, sendAllSlots))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -2742,8 +2683,8 @@ bool ScriptMgr::CanGroupJoinBattlegroundQueue(Group const* group, Player* member
     bool ret = true;
 
     FOR_SCRIPTS_RET(GroupScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanGroupJoinBattlegroundQueue(group, member, bgTemplate, MinPlayerCount, isRated, arenaSlot))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->CanGroupJoinBattlegroundQueue(group, member, bgTemplate, MinPlayerCount, isRated, arenaSlot))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -2763,8 +2704,8 @@ bool ScriptMgr::IfNormalReaction(Unit const* unit, Unit const* target, Reputatio
     bool ret = true;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IfNormalReaction(unit, target, repRank))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IfNormalReaction(unit, target, repRank))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2774,8 +2715,8 @@ bool ScriptMgr::IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEf
     bool ret = true;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IsNeedModSpellDamagePercent(unit, auraEff, doneTotalMod, spellProto))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IsNeedModSpellDamagePercent(unit, auraEff, doneTotalMod, spellProto))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2785,8 +2726,8 @@ bool ScriptMgr::IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEf
     bool ret = true;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IsNeedModMeleeDamagePercent(unit, auraEff, doneTotalMod, spellProto))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IsNeedModMeleeDamagePercent(unit, auraEff, doneTotalMod, spellProto))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2796,8 +2737,8 @@ bool ScriptMgr::IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, floa
     bool ret = true;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IsNeedModHealPercent(unit, auraEff, doneTotalMod, spellProto))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IsNeedModHealPercent(unit, auraEff, doneTotalMod, spellProto))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2807,8 +2748,8 @@ bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool upda
     bool ret = true;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSetPhaseMask(unit, newPhaseMask, update))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSetPhaseMask(unit, newPhaseMask, update))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2818,8 +2759,8 @@ bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, By
     bool ret = false;
 
     FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index))
-            ret = true; // we change ret value only when scripts return true
+    if (itr->second->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index))
+        ret = true; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -2834,8 +2775,8 @@ bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, 
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendMessageBGQueue(queue, leader, bg, bracketEntry))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSendMessageBGQueue(queue, leader, bg, bracketEntry))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2845,8 +2786,8 @@ bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Play
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->OnBeforeSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->OnBeforeSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2856,8 +2797,8 @@ bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, Grou
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->OnBeforeSendExitMessageArenaQueue(queue, ginfo))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->OnBeforeSendExitMessageArenaQueue(queue, ginfo))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2867,8 +2808,8 @@ bool ScriptMgr::CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* targ
     bool ret = true;
 
     FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2878,8 +2819,8 @@ bool ScriptMgr::CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, 
     bool ret = true;
 
     FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2894,8 +2835,8 @@ bool ScriptMgr::CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEf
     bool ret = true;
 
     FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanPrepare(spell, targets, triggeredByAura))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanPrepare(spell, targets, triggeredByAura))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2905,8 +2846,8 @@ bool ScriptMgr::CanScalingEverything(Spell* spell)
     bool ret = false;
 
     FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanScalingEverything(spell))
-            ret = true; // we change ret value only when scripts return false
+    if (itr->second->CanScalingEverything(spell))
+        ret = true; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2916,8 +2857,8 @@ bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
     bool ret = true;
 
     FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSelectSpecTalent(spell))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSelectSpecTalent(spell))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2947,8 +2888,8 @@ bool ScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntr
     bool ret = true;
 
     FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IsCompletedCriteria(mgr, achievementCriteria, achievement, progress))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IsCompletedCriteria(mgr, achievementCriteria, achievement, progress))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2958,8 +2899,8 @@ bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, Achievem
     bool ret = true;
 
     FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->IsRealmCompleted(globalmgr, achievement, completionTime))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->IsRealmCompleted(globalmgr, achievement, completionTime))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2974,8 +2915,8 @@ bool ScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry c
     bool ret = true;
 
     FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanCheckCriteria(mgr, achievementCriteria))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanCheckCriteria(mgr, achievementCriteria))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -2995,8 +2936,8 @@ bool ScriptMgr::CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanUnlearnSpellSet(pet, level, spell))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanUnlearnSpellSet(pet, level, spell))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3006,8 +2947,8 @@ bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanUnlearnSpellDefault(pet, spellEntry))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanUnlearnSpellDefault(pet, spellEntry))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3017,8 +2958,8 @@ bool ScriptMgr::CanResetTalents(Pet* pet)
     bool ret = true;
 
     FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanResetTalents(pet))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanResetTalents(pet))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3028,8 +2969,8 @@ bool ScriptMgr::CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid)
     bool ret = true;
 
     FOR_SCRIPTS_RET(ArenaScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanAddMember(team, PlayerGuid))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->CanAddMember(team, PlayerGuid))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -3044,8 +2985,8 @@ bool ScriptMgr::CanSaveToDB(ArenaTeam* team)
     bool ret = true;
 
     FOR_SCRIPTS_RET(ArenaScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSaveToDB(team))
-            ret = false; // we change ret value only when scripts return true
+    if (!itr->second->CanSaveToDB(team))
+        ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
@@ -3060,8 +3001,8 @@ bool ScriptMgr::CanApplySoulboundFlag(Item* item, ItemTemplate const* proto)
     bool ret = true;
 
     FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanApplySoulboundFlag(item, proto))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanApplySoulboundFlag(item, proto))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3111,8 +3052,8 @@ bool ScriptMgr::CanItemApplyEquipSpell(Player* player, Item* item)
     bool ret = true;
 
     FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanItemApplyEquipSpell(player, item))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanItemApplyEquipSpell(player, item))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3122,8 +3063,8 @@ bool ScriptMgr::CanSendAuctionHello(WorldSession const* session, ObjectGuid guid
     bool ret = true;
 
     FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendAuctionHello(session, guid, creature))
-            ret = false; // we change ret value only when scripts return false
+    if (!itr->second->CanSendAuctionHello(session, guid, creature))
+        ret = false; // we change ret value only when scripts return false
 
     return ret;
 }
@@ -3159,249 +3100,208 @@ void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
 }
 
 ///-
-AllMapScript::AllMapScript(const char* name)
-    : ScriptObject(name)
+AllMapScript::AllMapScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AllMapScript>::AddScript(this);
 }
 
-AllCreatureScript::AllCreatureScript(const char* name)
-    : ScriptObject(name)
+AllCreatureScript::AllCreatureScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AllCreatureScript>::AddScript(this);
 }
 
-UnitScript::UnitScript(const char* name, bool addToScripts)
-    : ScriptObject(name)
+UnitScript::UnitScript(const char* name, bool addToScripts) : ScriptObject(name)
 {
     if (addToScripts)
         ScriptRegistry<UnitScript>::AddScript(this);
 }
 
-MovementHandlerScript::MovementHandlerScript(const char* name)
-    : ScriptObject(name)
+MovementHandlerScript::MovementHandlerScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<MovementHandlerScript>::AddScript(this);
 }
 
-SpellScriptLoader::SpellScriptLoader(const char* name)
-    : ScriptObject(name)
+SpellScriptLoader::SpellScriptLoader(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<SpellScriptLoader>::AddScript(this);
 }
 
-ServerScript::ServerScript(const char* name)
-    : ScriptObject(name)
+ServerScript::ServerScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ServerScript>::AddScript(this);
 }
 
-WorldScript::WorldScript(const char* name)
-    : ScriptObject(name)
+WorldScript::WorldScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<WorldScript>::AddScript(this);
 }
 
-FormulaScript::FormulaScript(const char* name)
-    : ScriptObject(name)
+FormulaScript::FormulaScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<FormulaScript>::AddScript(this);
 }
 
-WorldMapScript::WorldMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<Map>(mapId)
+WorldMapScript::WorldMapScript(const char* name, uint32 mapId) : ScriptObject(name), MapScript<Map>(mapId)
 {
     ScriptRegistry<WorldMapScript>::AddScript(this);
 }
 
-InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<InstanceMap>(mapId)
+InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId) : ScriptObject(name), MapScript<InstanceMap>(mapId)
 {
     ScriptRegistry<InstanceMapScript>::AddScript(this);
 }
 
-BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<BattlegroundMap>(mapId)
+BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId) : ScriptObject(name), MapScript<BattlegroundMap>(mapId)
 {
     ScriptRegistry<BattlegroundMapScript>::AddScript(this);
 }
 
-ItemScript::ItemScript(const char* name)
-    : ScriptObject(name)
+ItemScript::ItemScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ItemScript>::AddScript(this);
 }
 
-CreatureScript::CreatureScript(const char* name)
-    : ScriptObject(name)
+CreatureScript::CreatureScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<CreatureScript>::AddScript(this);
 }
 
-GameObjectScript::GameObjectScript(const char* name)
-    : ScriptObject(name)
+GameObjectScript::GameObjectScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<GameObjectScript>::AddScript(this);
 }
 
-AreaTriggerScript::AreaTriggerScript(const char* name)
-    : ScriptObject(name)
+AreaTriggerScript::AreaTriggerScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
 }
 
-BattlegroundScript::BattlegroundScript(const char* name)
-    : ScriptObject(name)
+BattlegroundScript::BattlegroundScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<BattlegroundScript>::AddScript(this);
 }
 
-OutdoorPvPScript::OutdoorPvPScript(const char* name)
-    : ScriptObject(name)
+OutdoorPvPScript::OutdoorPvPScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<OutdoorPvPScript>::AddScript(this);
 }
 
-CommandScript::CommandScript(const char* name)
-    : ScriptObject(name)
+CommandScript::CommandScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<CommandScript>::AddScript(this);
 }
 
-WeatherScript::WeatherScript(const char* name)
-    : ScriptObject(name)
+WeatherScript::WeatherScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<WeatherScript>::AddScript(this);
 }
 
-AuctionHouseScript::AuctionHouseScript(const char* name)
-    : ScriptObject(name)
+AuctionHouseScript::AuctionHouseScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AuctionHouseScript>::AddScript(this);
 }
 
-ConditionScript::ConditionScript(const char* name)
-    : ScriptObject(name)
+ConditionScript::ConditionScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ConditionScript>::AddScript(this);
 }
 
-VehicleScript::VehicleScript(const char* name)
-    : ScriptObject(name)
+VehicleScript::VehicleScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<VehicleScript>::AddScript(this);
 }
 
-DynamicObjectScript::DynamicObjectScript(const char* name)
-    : ScriptObject(name)
+DynamicObjectScript::DynamicObjectScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<DynamicObjectScript>::AddScript(this);
 }
 
-TransportScript::TransportScript(const char* name)
-    : ScriptObject(name)
+TransportScript::TransportScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<TransportScript>::AddScript(this);
 }
 
-AchievementCriteriaScript::AchievementCriteriaScript(const char* name)
-    : ScriptObject(name)
+AchievementCriteriaScript::AchievementCriteriaScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AchievementCriteriaScript>::AddScript(this);
 }
 
-PlayerScript::PlayerScript(const char* name)
-    : ScriptObject(name)
+PlayerScript::PlayerScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<PlayerScript>::AddScript(this);
 }
 
-AccountScript::AccountScript(const char* name)
-    : ScriptObject(name)
+AccountScript::AccountScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AccountScript>::AddScript(this);
 }
 
-GuildScript::GuildScript(const char* name)
-    : ScriptObject(name)
+GuildScript::GuildScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<GuildScript>::AddScript(this);
 }
 
-GroupScript::GroupScript(const char* name)
-    : ScriptObject(name)
+GroupScript::GroupScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<GroupScript>::AddScript(this);
 }
 
-GlobalScript::GlobalScript(const char* name)
-    : ScriptObject(name)
+GlobalScript::GlobalScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<GlobalScript>::AddScript(this);
 }
 
-BGScript::BGScript(char const* name)
-    : ScriptObject(name)
+BGScript::BGScript(char const* name) : ScriptObject(name)
 {
     ScriptRegistry<BGScript>::AddScript(this);
 }
 
-ArenaTeamScript::ArenaTeamScript(const char* name)
-    : ScriptObject(name)
+ArenaTeamScript::ArenaTeamScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ArenaTeamScript>::AddScript(this);
 }
 
-SpellSC::SpellSC(char const* name)
-    : ScriptObject(name)
+SpellSC::SpellSC(char const* name) : ScriptObject(name)
 {
     ScriptRegistry<SpellSC>::AddScript(this);
 }
 
-ModuleScript::ModuleScript(const char* name)
-    : ScriptObject(name)
+ModuleScript::ModuleScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);
 }
 
-GameEventScript::GameEventScript(const char* name)
-    : ScriptObject(name)
+GameEventScript::GameEventScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<GameEventScript>::AddScript(this);
 }
 
-MailScript::MailScript(const char* name)
-    : ScriptObject(name)
+MailScript::MailScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<MailScript>::AddScript(this);
 }
 
-AchievementScript::AchievementScript(const char* name)
-    : ScriptObject(name)
+AchievementScript::AchievementScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AchievementScript>::AddScript(this);
 }
 
-PetScript::PetScript(const char* name)
-    : ScriptObject(name)
+PetScript::PetScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<PetScript>::AddScript(this);
 }
 
-ArenaScript::ArenaScript(const char* name)
-    : ScriptObject(name)
+ArenaScript::ArenaScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<ArenaScript>::AddScript(this);
 }
 
-MiscScript::MiscScript(const char* name)
-    : ScriptObject(name)
+MiscScript::MiscScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<MiscScript>::AddScript(this);
 }
 
-CommandSC::CommandSC(const char* name)
-    : ScriptObject(name)
+CommandSC::CommandSC(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<CommandSC>::AddScript(this);
 }
