@@ -14,7 +14,7 @@
  */
 
 #include "AnticheatMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "Configuration/Config.h"
 
