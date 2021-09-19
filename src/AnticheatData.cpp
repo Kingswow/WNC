@@ -282,9 +282,9 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         return true;
     }
 
-    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Enabled", true) && movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+    if (sConfigMgr->GetOption<bool>("AntiCheats.FakeJumper.Enabled", true) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
     {
-        if (!IsJumpingbyOpcode() && !UnderACKmount() && !movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY))
+        if (!IsJumpingbyOpcode() && !UnderACKmount() && !mover->IsFlying())
         {
             // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
             LOG_INFO("anticheat", "PassiveAnticheat: Fake jumper by Account id : %u, Player %s (%s), Mover: (%s, %s), Map: %d, Position: %s (TransportOffsets: %s), MovementFlags: %d",
@@ -337,7 +337,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
     uint32 oldctime = GetLastMoveClientTimestamp();
     if (oldctime)
     {
-        if (movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || mover->IsInFlight())
+        if (mover->IsFalling() || mover->IsInFlight())
         {
             return true;
         }
@@ -411,7 +411,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         // calculate distance - don't use func, because x,z can be offset transport coords
         distance = sqrt(((npos.GetPositionY() - y) * (npos.GetPositionY() - y)) + ((npos.GetPositionX() - x) * (npos.GetPositionX() - x)));
 
-        if (opcode != MSG_MOVE_JUMP && !mover->CanFly() && !movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY) && !movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING) && !transportflag && distance > 0.f)
+        if (opcode != MSG_MOVE_JUMP && !mover->CanFly() && !mover->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) && !mover->isSwimming() && !transportflag && distance > 0.f)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - z);
             float tanangle = distance / diffz;
@@ -438,7 +438,7 @@ bool AnticheatData::CheckMovement(MovementInfo const& movementInfo, Unit* mover,
         uint32 ping;
         ptime = movementInfo.time;
 
-        UnitMoveType moveType = Movement::SelectSpeedType(movementInfo.GetMovementFlags());
+        UnitMoveType moveType = Movement::SelectSpeedType(mover->GetUnitMovementFlags());
         if ((opcode == CMSG_MOVE_SET_FLY || opcode == MSG_MOVE_FALL_LAND) && movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
         {
             moveType = MOVE_FLIGHT;
