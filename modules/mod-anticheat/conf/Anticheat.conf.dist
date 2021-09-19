@@ -3,7 +3,7 @@
 ###################################################################################################
 
 ###################################################################################################
-# ANTI-CHEAT SETTINGS
+# ANTI-CHEAT: FLYHACK SETTINGS
 #    AntiCheats.FlyHack
 #        Description: Enable AntiCheat.FlyHack
 #        Default:     1 - (Enabled)
@@ -11,53 +11,333 @@
 
 AntiCheats.FlyHack.Enabled = 1
 
-#    AntiCheats.FlyHack
+#    AntiCheats.FlyHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on flyhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 flyhack reports in `anticheat_logs`.
+
+AntiCheats.FlyHack.GMText = -1
+
+#    AntiCheats.FlyHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on flyhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 flyhack reports in `anticheat_logs`.
+
+AntiCheats.FlyHack.ApplyPenalty = 0
+
+#    AntiCheats.FlyHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.FlyHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Char Ban) Permanent ban for player from the server
+#                     3 - (Account Ban) Permanent ban for account from the server
+
+AntiCheats.FlyHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: SPEEDHACK SETTINGS
+#    AntiCheats.SpeedHack
 #        Description: Enable AntiCheat.SpeedHack
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
 AntiCheats.SpeedHack.Enabled = 1
 
-#    AntiCheats.DoubleJump.Enabled
-#        Description: Enable AntiCheat.DoubleJump Kick when player sent opcode jump when has flag falling (client can't do this)
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#    AntiCheats.SpeedHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on speedhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 speedhack reports in `anticheat_logs`.
 
-AntiCheats.DoubleJump.Enabled = 1
+AntiCheats.SpeedHack.GMText = -1
 
-#    AntiCheats.FakeJumper.Enabled
-#        Description: Enable AntiCheat.FakeJumper : when player sent a move opcode (with new Z higher) when has flag falling (client can't sent any new packets when falling)
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#    AntiCheats.SpeedHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on speedhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 speedhack reports in `anticheat_logs`.
 
-AntiCheats.FakeJumper.Enabled = 1
+AntiCheats.SpeedHack.ApplyPenalty = 0
 
-#    AntiCheats.FakeFlyingmode.Enabled
-#        Description: Enable AntiCheat.FakeFlyingmode : when player sent a move opcode with added fly flag but on server this flag doesn't restricted for player.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#    AntiCheats.SpeedHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.SpeedHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
 
-AntiCheats.FakeFlyingmode.Enabled = 1
-
-#    AntiCheats.IgnoreControlMovement.Enabled
-#        Description: Enable AntiCheat.IgnoreControlMovement : when player in root state - client can't send a new movement packets.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AntiCheats.IgnoreControlMovement.Enabled = 1
-
-#    AntiCheats.Waterwalk.Enabled
-#        Description: Enable AntiCheat.Waterwalk : when player got MOVEMENTFLAG_WATERWALK but without waterwalk aura
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AntiCheats.Waterwalk.Enabled = 1
-
+AntiCheats.SpeedHack.PenaltyType = 0
 #
 ###################################################################################################
 
 ###################################################################################################
-# Logs for Anticheat
+# ANTI-CHEAT: DOUBLEJUMPHACK SETTINGS
+#    AntiCheats.DoubleJumpHack
+#        Description: Enable DoubleJumpHack.FlyHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.DoubleJumpHack.Enabled = 1
+
+#    AntiCheats.DoubleJumpHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on double jump hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 double jump hack reports in `anticheat_logs`.
+
+AntiCheats.DoubleJumpHack.GMText = -1
+
+#    AntiCheats.DoubleJumpHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on double jump hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 double jump hack reports in `anticheat_logs`.
+
+AntiCheats.DoubleJumpHack.ApplyPenalty = 0
+
+#    AntiCheats.DoubleJumpHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.DoubleJumpHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.DoubleJumpHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: FAKEJUMPHACK SETTINGS
+#    AntiCheats.FakeJumpHack
+#        Description: Enable AntiCheat.FakeJumpHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.FakeJumpHack.Enabled = 1
+
+#    AntiCheats.FakeJumpHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on fake jump hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 fake jump hack reports in `anticheat_logs`.
+
+AntiCheats.FakeJumpHack.GMText = -1
+
+#    AntiCheats.FakeJumpHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on fake jump hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 fake jump hack reports in `anticheat_logs`.
+
+AntiCheats.FakeJumpHack.ApplyPenalty = 0
+
+#    AntiCheats.FakeJumpHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.FakeJumpHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.FakeJumpHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: FAKEFLYHACK SETTINGS
+#    AntiCheats.FakeFlyHack
+#        Description: Enable FakeFlyHack.FlyHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.FakeFlyHack.Enabled = 1
+
+#    AntiCheats.FakeFlyHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on fake fly hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 fake fly hack reports in `anticheat_logs`.
+
+AntiCheats.FakeFlyHack.GMText = -1
+
+#    AntiCheats.FakeFlyHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on fake fly hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 fake fly hack reports in `anticheat_logs`.
+
+AntiCheats.FakeFlyHack.ApplyPenalty = 0
+
+#    AntiCheats.FakeFlyHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.FakeFlyHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.FakeFlyHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: IGNORECONTROLHACK SETTINGS
+#    AntiCheats.IgnoreControlHack
+#        Description: Enable AntiCheat.IgnoreControlHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.IgnoreControlHack.Enabled = 1
+
+#    AntiCheats.IgnoreControlHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on ignore control hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 ignore control hack reports in `anticheat_logs`.
+
+AntiCheats.IgnoreControlHack.GMText = -1
+
+#    AntiCheats.IgnoreControlHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on ignore control hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 ignore control hack reports in `anticheat_logs`.
+
+AntiCheats.IgnoreControlHack.ApplyPenalty = 0
+
+#    AntiCheats.IgnoreControlHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.IgnoreControlHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.IgnoreControlHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: CLIMBHACK SETTINGS
+#    AntiCheats.ClimbHack
+#        Description: Enable ClimbHack.FlyHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.ClimbHack.Enabled = 1
+
+#    AntiCheats.ClimbHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on climbhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 climbhack reports in `anticheat_logs`.
+
+AntiCheats.ClimbHack.GMText = -1
+
+#    AntiCheats.ClimbHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on climbhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 climbhack reports in `anticheat_logs`.
+
+AntiCheats.ClimbHack.ApplyPenalty = 0
+
+#    AntiCheats.ClimbHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.ClimbHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.ClimbHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: NOFALLINGHACK SETTINGS
+#    AntiCheats.NoFallingHack
+#        Description: Enable NoFallingHack.FlyHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.NoFallingHack.Enabled = 1
+
+#    AntiCheats.NoFallingHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on no falling hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 no falling hack reports in `anticheat_logs`.
+
+AntiCheats.NoFallingHack.GMText = -1
+
+#    AntiCheats.NoFallingHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on no falling hack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 no falling hack reports in `anticheat_logs`.
+
+AntiCheats.NoFallingHack.ApplyPenalty = 0
+
+#    AntiCheats.NoFallingHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.NoFallingHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.NoFallingHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: WATERWALKHACK SETTINGS
+#    AntiCheats.WaterwalkHack
+#        Description: Enable AntiCheat.WaterwalkHack
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.WaterwalkHack.Enabled = 1
+
+#    AntiCheats.WaterwalkHack.GMText
+#        Description: Decide whenever server should send warning about potential hacker to GMs ingame
+#        Default:     -1 - (Enabled) Every single warning will be send to GMs
+#                     0 - (Disabled) No warning send to GMs
+#                     > 0 - Warning will be send to GMs depending on waterwalkhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Warning will be send to GMs ingame if hacker will exceed 50 waterwalkhack reports in `anticheat_logs`.
+
+AntiCheats.WaterwalkHack.GMText = -1
+
+#    AntiCheats.WaterwalkHack.ApplyPenalty
+#        Description: Decide whenever server automatically punish the hacker
+#        Default:     0 - (Disabled) No automatic penalty - you can always punish the hacker by yourself manually (e.g via command)
+#                     -1 - (Enabled) Every single report will be punished
+#                     > 0 - Penalty will be apply depending on waterwalkhack report numbers in DB (in `anticheat_logs`)
+#                           E.g. 50 - Penalty will be apply if hacker will exceed 50 waterwalkhack reports in `anticheat_logs`.
+
+AntiCheats.WaterwalkHack.ApplyPenalty = 0
+
+#    AntiCheats.WaterwalkHack.PenaltyType
+#        Description: Choose penalty type (only if AntiCheats.WaterwalkHack.ApplyPenalty is enabled)
+#        Default:     0 - (None) No penalty
+#                     1 - (Kick) Kick from the server
+#                     2 - (Ban) Permanent ban from the server
+
+AntiCheats.WaterwalkHack.PenaltyType = 0
+#
+###################################################################################################
+
+###################################################################################################
+# ANTI-CHEAT: LOGGING SETTINGS
 
 Appender.Anticheat=2,3,15,Anticheat.log
 Logger.anticheat=4,Console Anticheat
@@ -66,86 +346,13 @@ Logger.anticheat=4,Console Anticheat
 ###################################################################################################
 
 ###################################################################################################
-# Sanctions - Kicks
-#
-#    AntiCheats.FlyHack.Kick.Enabled
-#        Description: Enable AntiCheat.FlyHack Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.FlyHack.Kick.Enabled = 1
-
-#    AntiCheats.SpeedHack.Kick.Enabled
-#        Description: Enable AntiCheat.SpeedHack Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.SpeedHack.Kick.Enabled = 1
-
-#    AntiCheats.DoubleJump.Kick.Enabled
-#        Description: Enable AntiCheats.DoubleJump Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.DoubleJump.Kick.Enabled = 1
-
-#    AntiCheats.FakeJumper.Kick.Enabled
-#        Description: Enable AntiCheats.FakeJumper Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.FakeJumper.Kick.Enabled = 1
-
-#    AntiCheats.FakeFlyingmode.Kick.Enabled
-#        Description: Enable AntiCheats.FakeFlyingmode Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.FakeFlyingmode.Kick.Enabled = 1
-
-#    AntiCheats.NoFallingDmg.Kick.Enabled
-#        Description: Enable AntiCheats.NoFallingDmg Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.NoFallingDmg.Kick.Enabled = 1
-
-#    AntiCheats.Wallclimb.Kick.Enabled
-#        Description: Enable AntiCheats.Wallclimb Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.Wallclimb.Kick.Enabled = 1
-
-#    AntiCheats.MoveUnderControl.Kick.Enabled
-#        Description: Enable AntiCheats.MoveUnderControl Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.MoveUnderControl.Kick.Enabled = 1
-
-#    AntiCheats.Waterwalk.Kick.Enabled
-#        Description: Enable AntiCheats.Waterwalk Kick when detected
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AntiCheats.Waterwalk.Kick.Enabled = 1
-
-#
-###################################################################################################
-
-###################################################################################################
+# ANTI-CHEAT: MISC SETTINGS
 #    AntiCheats.FlyHackTimer
 #        Description: Timer for AntiCheat FlyHack check
 #        Default:     3000 - 1 check in 3 second (for big projects better (1500ppl +) set 5000 (5 sec) or more)
 
 AntiCheats.FlyHackTimer = 3000
 
-#
-###################################################################################################
-
-###################################################################################################
-#
 # AntiCheats.forceExcludeMapsid disabled maps
 #        Description: disabled mapid for anticheat system
 #        Example:     "616,649"
