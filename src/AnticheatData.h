@@ -18,7 +18,29 @@ enum CheatTypes
     IGNORE_CONTROL,
     CLIMB_HACK,
     NO_FALLING,
-    WATERWALK
+    WATERWALK,
+
+    MAX_CHEATS
+};
+
+enum GMTextType
+{
+    GM_TEXT_EVERY_REPORT        = -1,
+    GM_TEXT_NONE                = 0
+};
+
+enum AppyPenaltyType
+{
+    APPLY_PENALTY_EVERY_REPORT  = -1,
+    APPLY_PENALTY_NONE          = 0
+};
+
+enum PenaltyType
+{
+    PENALTY_NONE                = 0,
+    PENALTY_KICK                = 1,
+    PENALTY_BAN_PLAYER          = 2,
+    PENALTY_BAN_ACCOUNT         = 3
 };
 
 class AnticheatData
@@ -26,6 +48,8 @@ class AnticheatData
     public:
         AnticheatData(Player* player = nullptr, uint32 time = 0);
         ~AnticheatData();
+
+        bool LoadFromDB(Player* player);
 
         void Update(uint32 time);
 
@@ -70,6 +94,9 @@ class AnticheatData
         void HandleNoFallingDamage(uint16 opcode);
 
         void RecordAntiCheatLog(CheatTypes cheatType);
+        bool ApplyPenalty(CheatTypes cheatType);
+
+        void SendGMText(CheatTypes cheatType, uint32 stringId, ...);
 
     private:
         Player* m_owner;
@@ -94,6 +121,7 @@ class AnticheatData
         bool m_walking;             // Player walking
 
         bool m_loadedFromDB;
+        std::array<uint32, MAX_CHEATS> m_reports;
 };
 
 #endif
