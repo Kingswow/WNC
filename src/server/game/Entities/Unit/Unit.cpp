@@ -17174,39 +17174,10 @@ void Unit::SetStunned(bool apply)
 {
     if (apply)
     {
-        if (m_rootTimes > 0) // blizzard internal check?
-            m_rootTimes++;
-
         SetTarget();
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
-        // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
-        // setting MOVEMENTFLAG_ROOT
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-
         if (GetTypeId() == TYPEID_PLAYER)
-        {
-            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
-            data << GetPackGUID();
-            data << m_rootTimes;
-            SendMessageToSet(&data, true);
-        }
-        else
-        {
-            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-            data << GetPackGUID();
-            SendMessageToSet(&data, true);
-        }
-
-        // xinef: inform client about our current orientation
-        SendMovementFlagUpdate();
-
-        // Creature specific
-        if (GetTypeId() != TYPEID_PLAYER)
-            StopMoving();
-        else
         {
             SetStandState(UNIT_STAND_STATE_STAND);
         }
@@ -17215,6 +17186,8 @@ void Unit::SetStunned(bool apply)
         {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
         }
+
+        SetRooted(true);
 
         CastStop();
     }
@@ -17240,21 +17213,7 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            if (GetTypeId() == TYPEID_PLAYER)
-            {
-                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
-                data << GetPackGUID();
-                data << ++m_rootTimes;
-                SendMessageToSet(&data, true);
-            }
-            else
-            {
-                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                data << GetPackGUID();
-                SendMessageToSet(&data, true);
-            }
-
-            RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            SetRooted(false);
         }
     }
 }
@@ -17270,21 +17229,34 @@ void Unit::SetRooted(bool apply)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (IsFalling())
         {
-            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
-            data << GetPackGUID();
-            data << m_rootTimes;
-            SendMessageToSet(&data, true);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
         else
         {
-            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+        }
+
+         // Creature specific
+        if (GetTypeId() != TYPEID_PLAYER)
+        {
+            StopMoving();
+        }
+
+        if (m_movedByPlayer)
+        {
+            WorldPacket data(SMSG_FORCE_MOVE_ROOT, GetPackGUID().size() + 4);
+            data << GetPackGUID();
+            data << m_rootTimes;
+            m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        }
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, GetPackGUID().size());
             data << GetPackGUID();
             SendMessageToSet(&data, true);
-            StopMoving();
         }
 
         if (m_movedByPlayer)
@@ -17294,23 +17266,23 @@ void Unit::SetRooted(bool apply)
     }
     else
     {
+        RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
+
         if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
         {
-            if (GetTypeId() == TYPEID_PLAYER)
+            if (m_movedByPlayer)
             {
-                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
+                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
                 data << GetPackGUID();
-                data << ++m_rootTimes;
-                SendMessageToSet(&data, true);
+                data << m_rootTimes;
+                m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
             }
             else
             {
-                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, GetPackGUID().size());
                 data << GetPackGUID();
                 SendMessageToSet(&data, true);
             }
-
-            RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
     }
 }
