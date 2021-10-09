@@ -2668,9 +2668,18 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     }
 
     // still not in LoS, give up and return first position found
-    x = first_x;
-    y = first_y;
-    z = first_z;
+    if (startPos)
+    {
+        x = searcher->GetPositionX();
+        y = searcher->GetPositionY();
+        z = searcher->GetPositionZ();
+    }
+    else
+    {
+        x = first_x;
+        y = first_y;
+        z = first_z;
+    }
 }
 
 void WorldObject::GetTheClosestPoint(float& x, float& y, float& z, float rangecheck, float startedZ, float controlZ) const
