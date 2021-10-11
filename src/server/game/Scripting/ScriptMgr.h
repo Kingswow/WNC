@@ -995,7 +995,7 @@ public:
     virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) {}
 
     // Called when a player queues a Random Dungeon using the RDF (Random Dungeon Finder)
-    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32 & /*rDungeonId*/) { }
+    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32& /*rDungeonId*/) {}
 
     // Called when a player is removed from battleground
     virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) {}
@@ -1301,8 +1301,8 @@ public:
     virtual void               AnticheatSetRootACKUpd(Player* /*player*/) {}
     virtual void               AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) {}
     virtual void               AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) {}
-    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/, MovementInfo const& /*movementInfo*/) { return true; }
-    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, uint16 /*opcode*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/, MovementInfo const& /*movementInfo*/)
+    {
         return true;
     }
     [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, uint16 /*opcode*/)
@@ -2016,7 +2016,7 @@ public: /* PlayerScript */
     bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
-    void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
+    void OnPlayerQueueRandomDungeon(Player* player, uint32& rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
