@@ -1301,8 +1301,8 @@ public:
     virtual void               AnticheatSetRootACKUpd(Player* /*player*/) {}
     virtual void               AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) {}
     virtual void               AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) {}
-    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/, MovementInfo const& /*movementInfo*/)
-    {
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/, MovementInfo const& /*movementInfo*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, uint16 /*opcode*/) { return true; }
         return true;
     }
     [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, uint16 /*opcode*/)

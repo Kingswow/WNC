@@ -17192,11 +17192,6 @@ void Unit::SetStunned(bool apply)
             SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        if (m_movedByPlayer)
-        {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
-        }
-
         SetRooted(true);
 
         CastStop();

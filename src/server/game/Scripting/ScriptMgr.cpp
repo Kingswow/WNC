@@ -2640,7 +2640,7 @@ bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementI
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-    if (!itr->second->AnticheatHandleDoubleJump(player, mover, movementInfo))
+        if (!itr->second->AnticheatHandleDoubleJump(player, mover, movementInfo))
         ret = false; // we change ret value only when scripts return true
 
     return ret;
@@ -2651,7 +2651,7 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-    if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, opcode))
+        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, opcode))
         ret = false; // we change ret value only when scripts return true
 
     return ret;
@@ -3317,7 +3317,8 @@ MiscScript::MiscScript(const char* name) : ScriptObject(name)
     ScriptRegistry<MiscScript>::AddScript(this);
 }
 
-CommandSC::CommandSC(const char* name) : ScriptObject(name)
+CommandSC::CommandSC(const char* name)
+    : ScriptObject(name)
 {
     ScriptRegistry<CommandSC>::AddScript(this);
 }
