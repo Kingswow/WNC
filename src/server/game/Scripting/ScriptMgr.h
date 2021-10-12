@@ -879,6 +879,9 @@ public:
     // Called when a player kills another player
     virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) {}
 
+    // Called when a player toggles pvp
+    virtual void OnPlayerPVPFlagChange(Player* /*player*/, bool /*state*/) { }
+
     // Called when a player kills a creature
     virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) {}
 
@@ -1979,6 +1982,7 @@ public: /* PlayerScript */
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
+    void OnPlayerPVPFlagChange(Player* player, bool state);
     void OnCreatureKill(Player* killer, Creature* killed);
     void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed);
