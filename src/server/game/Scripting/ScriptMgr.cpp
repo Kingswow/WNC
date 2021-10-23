@@ -1011,8 +1011,6 @@ Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()
         std::move(cmds.begin(), cmds.end(), std::back_inserter(table));
     }
 
-    // Sort commands in alphabetical order
-    std::sort(table.begin(), table.end(), [](const ChatCommand& a, const ChatCommand& b) { return strcmp(a.Name, b.Name) < 0; });
     return table;
 }
 
