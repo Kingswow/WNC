@@ -1893,6 +1893,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         if (Aura* aura = Aura::TryCreate(m_spellInfo, MAX_EFFECT_MASK, dynObj, caster, &m_spellValue->EffectBasePoints[0]))
         {
             m_spellAura = aura;
+            m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
             m_spellAura->_RegisterForTargets();
         }
         else
