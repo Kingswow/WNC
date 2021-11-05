@@ -678,6 +678,19 @@ public:
     }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:

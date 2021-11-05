@@ -22,6 +22,7 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
+#include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
@@ -3192,6 +3193,36 @@ GameObjectScript::GameObjectScript(const char* name) : ScriptObject(name)
 AreaTriggerScript::AreaTriggerScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
+}
+
+bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTrigger const* trigger)
+{
+    uint32 const triggerId = trigger->entry;
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        if (instance->IsAreaTriggerDone(triggerId))
+        {
+            return true;
+        }
+        else
+        {
+            instance->MarkAreaTriggerDone(triggerId);
+        }
+    }
+    return _OnTrigger(player, trigger);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId)
+{
+    script->ResetAreaTriggerDone(triggerId);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTrigger const* trigger)
+{
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        ResetAreaTriggerDone(instance, trigger->entry);
+    }
 }
 
 BattlegroundScript::BattlegroundScript(const char* name) : ScriptObject(name)

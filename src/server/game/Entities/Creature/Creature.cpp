@@ -1802,7 +1802,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
-            UpdateSpeed(MOVE_RUN, false);
         }
 
         // Dismiss group if is leader
