@@ -17116,16 +17116,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (!creature->IsPet() && creature->GetLootMode() > 0)
         {
             creature->DeleteThreatList();
-
-            // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
-            {
+            CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+            if (cInfo && (cInfo->lootid || cInfo->maxgold > 0))
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            }
-            else
-            {
-                creature->AllLootRemovedFromCorpse();
-            }
         }
 
         // Call KilledUnit for creatures, this needs to be called after the lootable flag is set

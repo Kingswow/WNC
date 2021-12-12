@@ -177,8 +177,6 @@ public:
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
-    virtual void PetStopAttack() { }
-
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 

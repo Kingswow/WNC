@@ -67,8 +67,6 @@ public:
     void EnterEvadeMode() override {} // For fleeing, pets don't use this type of Evade mechanic
     void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
 
-    void PetStopAttack() override;
-
 private:
     bool _isVisible(Unit*) const;
     bool _needToStop(void);

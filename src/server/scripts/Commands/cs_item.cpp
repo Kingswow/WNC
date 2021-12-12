@@ -75,7 +75,7 @@ public:
         stmt->setUInt32(0, restoreId);
         PreparedQueryResult fields = CharacterDatabase.Query(stmt);
 
-        if (!fields || !(*fields)[1].GetUInt32() || (*fields)[3].GetUInt32() != player.GetGUID().GetCounter())
+        if (!fields || !(*fields)[1].GetUInt32())
         {
             handler->SendSysMessage(LANG_ITEM_RESTORE_MISSING);
             handler->SetSentErrorMessage(true);
@@ -121,13 +121,6 @@ public:
 
     static bool HandleItemRestoreListCommand(ChatHandler* handler, PlayerIdentifier player)
     {
-        if (!HasItemDeletionConfig())
-        {
-            handler->SendSysMessage(LANG_COMMAND_DISABLED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
         stmt->setUInt32(0, player.GetGUID().GetCounter());
         PreparedQueryResult disposedItems = CharacterDatabase.Query(stmt);
